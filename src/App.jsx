@@ -9,7 +9,7 @@ const S = {
   modal: { background: 'linear-gradient(135deg, rgba(30,30,35,1) 0%, rgba(20,20,25,1) 100%)', border: '1px solid rgba(255,255,255,0.1)' },
 };
 
-const API = 'https://other-surgeon-closely-acrobat.trycloudflare.com';
+const API = 'https://widescreen-whether-melissa-tomato.trycloudflare.com';
 const api = async (path, opts = {}) => {
   const token = localStorage.getItem('linguaToken');
   const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
