@@ -52,7 +52,11 @@ export default function App() {
     if (path.startsWith('/join/')) {
       const code = path.replace('/join/', '');
       localStorage.setItem('pendingInvite', code);
-      setCurrentPage('signup');
+      if (token) {
+        setCurrentPage('invite-landing');
+      } else {
+        setCurrentPage('signup');
+      }
     }
   }, []);
 
@@ -134,6 +138,8 @@ export default function App() {
       {currentPage === 'signup' && <SignupPage onNavigate={navigate} onSignup={handleSignup} />}
       {currentPage === 'login' && <LoginPage onNavigate={navigate} onLogin={handleLogin} />}
       {currentPage === 'dashboard' && <Dashboard user={user} groups={groups} inviteStats={inviteStats} onNavigate={navigate} onRefresh={refreshData} />}
+      {currentPage === 'invite-landing' && <InviteLandingPage onNavigate={navigate} />}
+      {currentPage === 'invited' && <InviteLandingPage onNavigate={navigate} />}
     </div>
   );
 }
@@ -367,6 +373,79 @@ function LoginPage({ onNavigate, onLogin }) {
 }
 
 // ============================================================================
+// INVITE LANDING PAGE
+// ============================================================================
+
+function InviteLandingPage({ onNavigate }) {
+  const [groupInfo, setGroupInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const inviteCode = localStorage.getItem('pendingInvite');
+
+  useEffect(() => {
+    if (!inviteCode) {
+      setError('No invite code found');
+      setLoading(false);
+      return;
+    }
+    fetch(`${API}/api/groups/invite/${inviteCode}`)
+      .then(r => r.ok ? r.json() : Promise.reject('Group not found'))
+      .then(data => { setGroupInfo(data); setLoading(false); })
+      .catch(() => { setError('Invalid or expired invite link'); setLoading(false); });
+  }, [inviteCode]);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center pt-24 text-gray-400">Loading...</div>;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 py-32">
+      <div className="w-full max-w-md text-center">
+        {error ? (
+          <>
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-8 h-8 text-red-400" />
+            </div>
+            <h1 className="text-2xl font-bold mb-4">{error}</h1>
+            <button onClick={() => onNavigate('home')} style={S.btnP} className="px-6 py-3 rounded-xl text-white font-medium">Go Home</button>
+          </>
+        ) : (
+          <>
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
+              <Users className="w-8 h-8 text-green-400" />
+            </div>
+            <h1 className="text-3xl font-bold mb-2">You're invited! 🎉</h1>
+            <p className="text-gray-400 mb-6">Join <span className="text-white font-medium">{groupInfo.name}</span> for real-time translation</p>
+            
+            <div style={S.card} className="rounded-xl p-5 mb-6 text-left">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-400 text-sm">Group</span>
+                <span className="font-medium">{groupInfo.name}</span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-400 text-sm">Created by</span>
+                <span className="text-sm">{groupInfo.ownerName}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-sm">Members</span>
+                <span className="text-sm">{groupInfo.members}</span>
+              </div>
+            </div>
+
+            {groupInfo.telegramLink ? (
+              <a href={groupInfo.telegramLink} target="_blank" rel="noopener noreferrer" style={S.btnP} className="w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 text-white">
+                Join Telegram Group <ExternalLink className="w-5 h-5" />
+              </a>
+            ) : (
+              <p className="text-gray-400 text-sm">Ask the group owner for the Telegram invite link!</p>
+            )}
+            <button onClick={() => onNavigate('dashboard')} className="mt-4 text-purple-400 text-sm hover:text-purple-300">Go to Dashboard →</button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // DASHBOARD
 // ============================================================================
 
@@ -425,7 +504,7 @@ function Dashboard({ user, groups, inviteStats, onNavigate, onRefresh }) {
 
   const openLangModal = (group) => {
     setShowLangModal(group.chatId);
-    setLangPairs(group.languagePairs || [['vi', 'en']]);
+    setLangPairs(group.languagePairs || [['vi', 'en'], ['en', 'vi']]);
   };
 
   const addLangPair = () => {
@@ -559,7 +638,7 @@ function Dashboard({ user, groups, inviteStats, onNavigate, onRefresh }) {
                   {/* Language Pairs */}
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <Globe className="w-4 h-4 text-cyan-400" />
-                    {(g.languagePairs || [['vi', 'en']]).map(([from, to], i) => (
+                    {(g.languagePairs || [['vi', 'en'], ['en', 'vi']]).map(([from, to], i) => (
                       <span key={i} className="text-xs px-2 py-1 rounded bg-cyan-500/20 text-cyan-300">
                         {getLang(from).flag} → {getLang(to).flag}
                       </span>
