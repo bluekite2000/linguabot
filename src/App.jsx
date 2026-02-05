@@ -147,6 +147,204 @@ export default function App() {
 }
 
 // ============================================================================
+// CHAT DEMO ANIMATION
+// ============================================================================
+
+function ChatDemo() {
+  const [visibleMessages, setVisibleMessages] = useState([]);
+  const [started, setStarted] = useState(false);
+  const containerRef = useRef(null);
+
+  const messages = [
+    { id: 1, sender: 'Mike', avatar: '👨‍💼', side: 'right', text: 'Hey Tam! Are we still meeting for lunch tomorrow?', color: '#6366f1' },
+    { id: 2, sender: 'LinguaBot', avatar: '🤖', side: 'bot', text: '🇻🇳 Chào Tam! Ngày mai chúng mình vẫn gặp nhau ăn trưa chứ?', color: '#a855f7' },
+    { id: 3, sender: 'Tam', avatar: '👩', side: 'left', text: 'Có chứ! Mình muốn thử quán phở mới ở đường Lê Lợi. Nghe nói ngon lắm!', color: '#06b6d4' },
+    { id: 4, sender: 'LinguaBot', avatar: '🤖', side: 'bot', text: '🇺🇸 Of course! I want to try the new pho place on Le Loi Street. I heard it\'s really good!', color: '#a855f7' },
+    { id: 5, sender: 'Mike', avatar: '👨‍💼', side: 'right', text: 'Sounds great! I love pho 🍜 What time works for you?', color: '#6366f1' },
+    { id: 6, sender: 'LinguaBot', avatar: '🤖', side: 'bot', text: '🇻🇳 Nghe tuyệt đó! Mình thích phở lắm 🍜 Mấy giờ tiện cho bạn?', color: '#a855f7' },
+    { id: 7, sender: 'Tam', avatar: '👩', side: 'left', text: '12 giờ trưa nhé! Mình sẽ đặt bàn trước 😊', color: '#06b6d4' },
+    { id: 8, sender: 'LinguaBot', avatar: '🤖', side: 'bot', text: '🇺🇸 12 noon! I\'ll book a table in advance 😊', color: '#a855f7' },
+  ];
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
+      { threshold: 0.3 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < messages.length) {
+        setVisibleMessages(prev => [...prev, messages[i]]);
+        i++;
+      } else {
+        clearInterval(interval);
+        // Loop: reset after a pause
+        setTimeout(() => {
+          setVisibleMessages([]);
+          setStarted(false);
+          setTimeout(() => setStarted(true), 500);
+        }, 4000);
+      }
+    }, 1200);
+    return () => clearInterval(interval);
+  }, [started]);
+
+  const chatRef = useRef(null);
+  useEffect(() => {
+    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [visibleMessages]);
+
+  return (
+    <section className="relative py-20 overflow-hidden" ref={containerRef}>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/[0.03] to-transparent" />
+      <div className="relative z-10 max-w-3xl mx-auto px-6">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">See It In Action</h2>
+          <p className="text-gray-400">Mike 🇺🇸 and Tam 🇻🇳 chatting seamlessly — LinguaBot handles the rest</p>
+        </div>
+
+        {/* Phone frame */}
+        <div className="max-w-md mx-auto">
+          <div className="rounded-3xl overflow-hidden" style={{ background: '#0c0c14', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 25px 60px rgba(0,0,0,0.5), 0 0 100px rgba(139,92,246,0.08)' }}>
+            {/* Telegram-style header */}
+            <div className="px-5 py-3.5 flex items-center gap-3" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(6,182,212,0.1))', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-sm">👥</div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-white">Vietnam Trip Planning 🌏</div>
+                <div className="text-xs text-gray-400">Mike, Tam, LinguaBot</div>
+              </div>
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                <span className="text-xs text-green-400">live</span>
+              </div>
+            </div>
+
+            {/* Chat area */}
+            <div ref={chatRef} className="px-4 py-5 space-y-3 overflow-y-auto" style={{ height: 420, scrollBehavior: 'smooth', background: 'radial-gradient(ellipse at top, rgba(139,92,246,0.04), transparent 70%)' }}>
+              {visibleMessages.map((msg, idx) => (
+                <div
+                  key={msg.id}
+                  className={`flex items-end gap-2 ${msg.side === 'right' ? 'flex-row-reverse' : 'flex-row'}`}
+                  style={{
+                    animation: 'chatBubbleIn 0.4s cubic-bezier(0.16,1,0.3,1)',
+                    opacity: 1,
+                  }}
+                >
+                  {/* Avatar */}
+                  {msg.side !== 'right' && (
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0"
+                      style={{
+                        background: msg.side === 'bot'
+                          ? 'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(99,102,241,0.3))'
+                          : 'linear-gradient(135deg, rgba(6,182,212,0.3), rgba(34,211,238,0.3))',
+                        border: `1px solid ${msg.side === 'bot' ? 'rgba(168,85,247,0.3)' : 'rgba(6,182,212,0.3)'}`,
+                      }}
+                    >
+                      {msg.avatar}
+                    </div>
+                  )}
+
+                  {/* Bubble */}
+                  <div className="max-w-[80%]">
+                    {msg.side !== 'right' && (
+                      <div className="text-[10px] font-medium mb-1 ml-1" style={{ color: msg.color }}>
+                        {msg.sender}
+                        {msg.side === 'bot' && <span className="ml-1 opacity-50">⚡ instant</span>}
+                      </div>
+                    )}
+                    <div
+                      className="px-3.5 py-2.5 text-sm leading-relaxed"
+                      style={{
+                        borderRadius: msg.side === 'right' ? '16px 16px 4px 16px' : msg.side === 'bot' ? '16px 16px 16px 4px' : '16px 16px 16px 4px',
+                        background: msg.side === 'right'
+                          ? 'linear-gradient(135deg, rgba(99,102,241,0.25), rgba(99,102,241,0.15))'
+                          : msg.side === 'bot'
+                          ? 'linear-gradient(135deg, rgba(168,85,247,0.12), rgba(139,92,246,0.08))'
+                          : 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(6,182,212,0.1))',
+                        border: msg.side === 'right'
+                          ? '1px solid rgba(99,102,241,0.2)'
+                          : msg.side === 'bot'
+                          ? '1px solid rgba(168,85,247,0.15)'
+                          : '1px solid rgba(6,182,212,0.15)',
+                        color: msg.side === 'bot' ? 'rgba(216,180,254,0.9)' : '#e4e4e7',
+                        fontStyle: msg.side === 'bot' ? 'italic' : 'normal',
+                      }}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Typing indicator */}
+              {visibleMessages.length > 0 && visibleMessages.length < messages.length && (
+                <div className="flex items-end gap-2" style={{ animation: 'chatBubbleIn 0.3s ease' }}>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0" style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(99,102,241,0.3))', border: '1px solid rgba(168,85,247,0.3)' }}>
+                    {messages[visibleMessages.length]?.side === 'bot' ? '🤖' : messages[visibleMessages.length]?.avatar}
+                  </div>
+                  <div className="px-4 py-3 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400" style={{ animation: 'typingDot 1.4s infinite', animationDelay: '0s' }} />
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400" style={{ animation: 'typingDot 1.4s infinite', animationDelay: '0.2s' }} />
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400" style={{ animation: 'typingDot 1.4s infinite', animationDelay: '0.4s' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-4 py-3 flex items-center gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+              <div className="flex-1 px-4 py-2.5 rounded-full text-sm text-gray-500" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                Type a message in any language...
+              </div>
+              <div className="w-9 h-9 rounded-full bg-purple-500/20 flex items-center justify-center">
+                <ArrowRight className="w-4 h-4 text-purple-400" />
+              </div>
+            </div>
+          </div>
+
+          {/* Labels below */}
+          <div className="flex justify-between mt-6 px-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(6,182,212,0.5)' }} />
+              <span className="text-xs text-gray-500">Tam speaks Vietnamese</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(168,85,247,0.5)' }} />
+              <span className="text-xs text-gray-500">LinguaBot translates instantly</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(99,102,241,0.5)' }} />
+              <span className="text-xs text-gray-500">Mike speaks English</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CSS animations */}
+      <style>{`
+        @keyframes chatBubbleIn {
+          0% { opacity: 0; transform: translateY(12px) scale(0.95); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes typingDot {
+          0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+          30% { opacity: 1; transform: translateY(-3px); }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+// ============================================================================
 // HOMEPAGE
 // ============================================================================
 
@@ -185,6 +383,9 @@ function HomePage({ onNavigate }) {
           </div>
         </div>
       </section>
+
+      {/* Chat Demo Animation */}
+      <ChatDemo />
 
       {/* How it works */}
       <section id="howto" className="relative py-24">
