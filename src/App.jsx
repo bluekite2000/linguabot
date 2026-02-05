@@ -54,7 +54,8 @@ export default function App() {
       const code = path.replace('/join/', '');
       localStorage.setItem('pendingInvite', code);
       if (token) {
-        setCurrentPage('invite-landing');
+        // Already logged in — just go to dashboard
+        navigate('dashboard');
       } else {
         setCurrentPage('signup');
       }
@@ -79,10 +80,9 @@ export default function App() {
       setUser(data.user);
       await refreshData();
       
-      // If invited to a group, show instructions
-      if (data.invitedGroup) {
-        setInvitedGroup(data.invitedGroup);
-        navigate('invited');
+      if (data.referral) {
+        // Show a nice welcome with bonus info
+        navigate('dashboard');
         return;
       }
       navigate('dashboard');
@@ -496,7 +496,7 @@ function SignupPage({ onNavigate, onSignup }) {
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center mx-auto mb-6"><Globe className="w-8 h-8" /></div>
           <h1 className="text-3xl font-bold mb-2">Create your account</h1>
           <p className="text-gray-400">Get your free translation hour</p>
-          {pendingInvite && <p className="text-green-400 text-sm mt-2">🎁 You've been invited! Sign up to join the group.</p>}
+          {pendingInvite && <p className="text-green-400 text-sm mt-2">🎁 You've been invited! Sign up to get 2 free hours (1 signup + 1 referral bonus).</p>}
         </div>
         <div className="rounded-2xl p-8" style={S.card}>
           {error && <div className="mb-6 px-4 py-3 rounded-xl flex items-center gap-3" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}><AlertCircle className="w-5 h-5 text-red-400" /><span className="text-sm text-red-300">{error}</span></div>}
@@ -785,7 +785,7 @@ function Dashboard({ user, groups, inviteStats, onNavigate, onRefresh }) {
   };
 
   const activeGroups = groups?.filter(g => g.active) || [];
-  const totalMembers = groups?.reduce((sum, g) => sum + (g.members || 0), 0) || 0;
+  const totalMembers = inviteStats?.totalInvites || 0;
   const totalHoursEarned = user.hoursEarned || 0;
 
   return (
@@ -813,7 +813,7 @@ function Dashboard({ user, groups, inviteStats, onNavigate, onRefresh }) {
             <div className="text-3xl font-bold">{activeGroups.length}</div>
           </div>
           <div style={S.card} className="rounded-2xl p-5">
-            <div className="text-sm text-gray-400 mb-1">Members Invited</div>
+            <div className="text-sm text-gray-400 mb-1">Friends Invited</div>
             <div className="text-3xl font-bold text-purple-400">{totalMembers}</div>
           </div>
           <div style={S.card} className="rounded-2xl p-5">
@@ -828,10 +828,37 @@ function Dashboard({ user, groups, inviteStats, onNavigate, onRefresh }) {
             <AlertCircle className="w-5 h-5 text-orange-400" />
             <div className="flex-1">
               <span className="text-sm text-orange-300 font-medium">Low balance!</span>
-              <span className="text-sm text-orange-300/70 ml-1">Share your invite links below to earn more hours.</span>
+              <span className="text-sm text-orange-300/70 ml-1">Share your invite link above to earn more hours.</span>
             </div>
           </div>
         )}
+
+        {/* Invite Friends */}
+        <div style={S.card} className="rounded-2xl p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-cyan-400" /> Invite Friends — Earn Hours
+          </h2>
+          <p className="text-gray-400 text-sm mb-4">Share your personal invite link. When a friend signs up, you both get +1 hour free!</p>
+          {user.inviteUrl && (
+            <div className="flex items-center gap-2">
+              <div className="flex-1 px-4 py-3 rounded-xl text-sm font-mono truncate" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                {user.inviteUrl}
+              </div>
+              <button
+                onClick={() => { navigator.clipboard.writeText(user.inviteUrl); }}
+                className="px-4 py-3 rounded-xl text-sm font-medium text-white shrink-0"
+                style={S.btnP}
+              >
+                Copy Link
+              </button>
+            </div>
+          )}
+          {inviteStats && inviteStats.totalInvites > 0 && (
+            <div className="mt-4 text-sm text-gray-400">
+              ✅ {inviteStats.totalInvites} friend{inviteStats.totalInvites !== 1 ? 's' : ''} invited · {inviteStats.totalHoursEarned}h earned
+            </div>
+          )}
+        </div>
 
         {/* Groups */}
         <div style={S.card} className="rounded-2xl p-6 mb-6">
