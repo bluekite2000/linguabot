@@ -119,7 +119,7 @@ export default function App() {
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ background: 'rgba(10,10,15,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <div className="cursor-pointer flex items-center gap-2.5" onClick={() => navigate('home')}><div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center"><Globe className="w-4 h-4 text-white" /></div><span className="font-semibold text-lg tracking-tight">LinguaBot</span></div>
+            <div className="cursor-pointer flex items-center gap-2.5" onClick={() => navigate('home')}><div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center"><Globe className="w-4 h-4 text-white" /></div><span className="font-semibold text-lg tracking-tight">LinguaXYZ</span></div>
             {navItems.map(item => (<a key={item.label} href={item.href} className="text-gray-300 hover:text-white transition-colors text-sm font-medium">{item.label}</a>))}
           </div>
           {user ? (
@@ -152,9 +152,9 @@ export default function App() {
 
 const DEMO_MESSAGES = [
   { id: 1, sender: 'Mike', avatar: '👨‍💼', side: 'right', text: 'Hey Tam! Are we still meeting for lunch tomorrow?', color: '#6366f1' },
-  { id: 2, sender: 'LinguaBot', avatar: '🤖', side: 'bot', text: '🇻🇳 Chào Tam! Ngày mai chúng mình vẫn gặp nhau ăn trưa chứ?', color: '#a855f7' },
+  { id: 2, sender: 'LinguaXYZ', avatar: '🤖', side: 'bot', text: '🇻🇳 Chào Tam! Ngày mai chúng mình vẫn gặp nhau ăn trưa chứ?', color: '#a855f7' },
   { id: 3, sender: 'Tam', avatar: '👩', side: 'left', text: 'Có chứ! Mình muốn thử quán phở mới 🍜', color: '#06b6d4' },
-  { id: 4, sender: 'LinguaBot', avatar: '🤖', side: 'bot', text: '🇺🇸 Of course! I want to try the new pho place 🍜', color: '#a855f7' },
+  { id: 4, sender: 'LinguaXYZ', avatar: '🤖', side: 'bot', text: '🇺🇸 Of course! I want to try the new pho place 🍜', color: '#a855f7' },
 ];
 
 function ChatDemo() {
@@ -210,7 +210,7 @@ function ChatDemo() {
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-sm">👥</div>
               <div className="flex-1">
                 <div className="text-sm font-semibold text-white">Vietnam Trip Planning 🌏</div>
-                <div className="text-xs text-gray-400">Mike, Tam, LinguaBot</div>
+                <div className="text-xs text-gray-400">Mike, Tam, LinguaXYZ</div>
               </div>
               <div className="flex gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
@@ -312,7 +312,7 @@ function ChatDemo() {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(168,85,247,0.5)' }} />
-              <span className="text-xs text-gray-500">LinguaBot translates instantly</span>
+              <span className="text-xs text-gray-500">LinguaXYZ translates instantly</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(99,102,241,0.5)' }} />
@@ -361,7 +361,7 @@ function HomePage({ onNavigate }) {
           </h1>
           
           <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-            Real-time Vietnamese ↔ English translation in your Telegram groups. 
+            Real-time AI translation for your Telegram groups — 20+ languages supported. 
             <span className="text-white"> No payments</span> — invite friends to earn unlimited free hours.
           </p>
           
@@ -391,7 +391,7 @@ function HomePage({ onNavigate }) {
           <div className="grid md:grid-cols-4 gap-6">
             {[
               { icon: <UserPlus className="w-6 h-6" />, title: 'Sign up', desc: 'Create account, get 1 free hour' },
-              { icon: <MessageCircle className="w-6 h-6" />, title: 'Add bot to group', desc: 'Add @clawdtranslatebot to any Telegram group' },
+              { icon: <MessageCircle className="w-6 h-6" />, title: 'Add bot to group', desc: 'Add @linguaxyz_bot to any Telegram group' },
               { icon: <Link className="w-6 h-6" />, title: 'Link your group', desc: 'Send /start, enter code on dashboard' },
               { icon: <Share2 className="w-6 h-6" />, title: 'Invite & earn', desc: 'Each friend who joins = +1 hour for both' },
             ].map((s, i) => (
@@ -410,7 +410,7 @@ function HomePage({ onNavigate }) {
       <section id="features" className="relative py-24 bg-white/[0.02]">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Why LinguaBot?</h2>
+            <h2 className="text-4xl font-bold mb-4">Why LinguaXYZ?</h2>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -845,7 +845,7 @@ function Dashboard({ user, groups, inviteStats, onNavigate, onRefresh }) {
                 <MessageCircle className="w-8 h-8 text-purple-400" />
               </div>
               <h3 className="font-semibold mb-2">No groups linked yet</h3>
-              <p className="text-gray-400 text-sm mb-4">Add @clawdtranslatebot to a Telegram group, send /start, then link it here.</p>
+              <p className="text-gray-400 text-sm mb-4">Add @linguaxyz_bot to a Telegram group, send /start, then link it here.</p>
               <button onClick={() => setShowLink(true)} style={S.btnP} className="px-6 py-2.5 rounded-xl text-white text-sm font-medium">Link a Group</button>
             </div>
           ) : (
@@ -927,7 +927,7 @@ function Dashboard({ user, groups, inviteStats, onNavigate, onRefresh }) {
             <div className="rounded-2xl p-6 max-w-md w-full" style={{ ...S.card, border: '1px solid rgba(255,255,255,0.1)' }}>
               <h2 className="text-xl font-bold mb-4">Link a Group</h2>
               <p className="text-gray-400 text-sm mb-4">
-                1. Add @clawdtranslatebot to your Telegram group<br />
+                1. Add @linguaxyz_bot to your Telegram group<br />
                 2. Send /start in the group<br />
                 3. Enter the 6-character code below
               </p>
