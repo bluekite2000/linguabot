@@ -1,224 +1,387 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, Component } from 'react';
+import { Check, Globe, MessageCircle, Zap, Users, Menu, X, ArrowRight, RefreshCw, Gift, Sparkles, AlertCircle, Share2, UserPlus, CreditCard, ExternalLink } from 'lucide-react';
 
 // ============================================================================
-// CONFIG
+// ERROR BOUNDARY
 // ============================================================================
 
-const API = window.location.origin;
-const BOT_USERNAME = "LinguaXYZBot"; // change to your bot username
-const TELEGRAM_URL = `https://t.me/${BOT_USERNAME}`;
-
-// ============================================================================
-// API HELPERS
-// ============================================================================
-
-async function fetchMe(token) {
-  const res = await fetch(`${API}/api/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Unauthorized");
-  return res.json();
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  componentDidCatch(error, info) { console.error('[ErrorBoundary]', error, info); }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#08080f', color: '#e4e4e7', fontFamily: 'system-ui' }}>
+          <div style={{ textAlign: 'center', maxWidth: 400, padding: 32 }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>😵</div>
+            <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Something went wrong</h1>
+            <p style={{ color: '#71717a', fontSize: 14, marginBottom: 24 }}>{this.state.error?.message || 'An unexpected error occurred'}</p>
+            <button onClick={() => { this.setState({ hasError: false, error: null }); window.location.href = '/'; }}
+              style={{ background: 'linear-gradient(135deg, #a855f7, #6366f1)', color: 'white', border: 'none', padding: '12px 24px', borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+              Back to Home
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
-// ============================================================================
-// FORMAT HELPERS
-// ============================================================================
+const API = 'https://api.nhomnhom.com';
+const BOT_URL = 'https://t.me/linguaxyz_bot';
+const S = {
+  card: { background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)', border: '1px solid rgba(255,255,255,0.06)' },
+  btnP: { background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)', border: 'none', cursor: 'pointer' },
+  btnS: { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' },
+};
 
 function formatTokens(n) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}k`;
+  if (!n || n === 0) return '0';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
   return String(n);
 }
 
-function timeAgo(dateStr) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
+async function apiFetch(path, opts = {}) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...opts.headers },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
 }
 
 // ============================================================================
-// MAIN APP
+// APP
 // ============================================================================
 
-export default function App() {
-  const [token, setToken] = useState(null);
-  const [data, setData] = useState(null);
+function AppInner() {
+  const [user, setUser] = useState(null);
+  const [inviteStats, setInviteStats] = useState(null);
+  const [usageStats, setUsageStats] = useState(null);
+  const [pricing, setPricing] = useState([]);
+  const [purchases, setPurchases] = useState([]);
+  const [currentPage, setCurrentPage] = useState('home');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const [showBuy, setShowBuy] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
-  // Extract token from URL on mount
+  const refreshData = async () => {
+    try {
+      const data = await apiFetch('/api/me');
+      setUser(data.user);
+      setInviteStats(data.inviteStats);
+      setUsageStats(data.usageStats);
+      setPricing(data.pricing || []);
+      setPurchases(data.purchases || []);
+    } catch (e) {
+      console.error('Refresh failed:', e);
+      localStorage.removeItem('token');
+      setUser(null);
+    }
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const t = params.get("token");
-    if (t) {
-      setToken(t);
-      window.history.replaceState({}, "", window.location.pathname);
+
+    // Magic login from bot's /web or /buy command
+    const urlToken = params.get('token');
+    if (urlToken) {
+      localStorage.setItem('token', urlToken);
+    }
+
+    // Show buy modal if ?buy=true
+    if (params.get('buy') === 'true') {
+      setShowBuy(true);
+    }
+
+    // Purchase success
+    if (params.get('purchased')) {
+      setPurchaseSuccess(true);
+    }
+
+    // Clean URL
+    if (urlToken || params.get('buy') || params.get('purchased') || params.get('cancelled')) {
+      window.history.replaceState({}, '', '/');
+    }
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      refreshData().then(() => {
+        setCurrentPage('dashboard');
+      }).finally(() => setLoading(false));
     } else {
-      const saved = sessionStorage.getItem("lingua_token");
-      if (saved) setToken(saved);
-      else setLoading(false);
+      setLoading(false);
     }
   }, []);
 
-  // Fetch user data when token is set
-  useEffect(() => {
-    if (!token) return;
-    sessionStorage.setItem("lingua_token", token);
-    setLoading(true);
-    fetchMe(token)
-      .then((d) => {
-        setData(d);
-        setLoading(false);
-      })
-      .catch(() => {
-        sessionStorage.removeItem("lingua_token");
-        setToken(null);
-        setError("Session expired. Use /web in the bot to get a new link.");
-        setLoading(false);
-      });
-  }, [token]);
-
-  const logout = () => {
-    sessionStorage.removeItem("lingua_token");
-    setToken(null);
-    setData(null);
+  const navigate = (page) => {
+    setCurrentPage(page);
+    if (page === 'home') window.history.pushState({}, '', '/');
+    window.scrollTo(0, 0);
   };
 
-  if (loading) return <LoadingScreen />;
-  if (data) return <Dashboard data={data} onLogout={logout} copied={copied} setCopied={setCopied} />;
-  return <LandingPage error={error} />;
-}
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('home');
+  };
 
-// ============================================================================
-// LOADING
-// ============================================================================
+  if (loading) return <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center text-white">Loading...</div>;
 
-function LoadingScreen() {
+  const navItems = [{ label: 'Features', href: '#features' }, { label: 'How It Works', href: '#howto' }];
+  const [mobileMenu, setMobileMenu] = useState(false);
+
   return (
-    <div style={styles.loadingWrap}>
-      <div style={styles.loadingPulse}>
-        <span style={styles.loadingIcon}>🌐</span>
-      </div>
-      <style>{`
-        @keyframes pulse { 0%,100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } }
-      `}</style>
-    </div>
-  );
-}
-
-// ============================================================================
-// LANDING PAGE
-// ============================================================================
-
-function LandingPage({ error }) {
-  return (
-    <div style={styles.landing}>
-      <style>{landingCSS}</style>
-
-      {/* NAV */}
-      <nav style={styles.nav}>
-        <div style={styles.navBrand}>
-          <span style={styles.navLogo}>語</span>
-          <span style={styles.navName}>LinguaXYZ</span>
+    <div className="min-h-screen bg-[#0a0a0f] text-white">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ background: 'rgba(10,10,15,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <div className="cursor-pointer flex items-center gap-2.5" onClick={() => navigate('home')}>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center"><Globe className="w-4 h-4 text-white" /></div>
+              <span className="font-semibold text-lg tracking-tight">LinguaXYZ</span>
+            </div>
+            {!user && (
+              <div className="hidden md:flex items-center gap-6">
+                {navItems.map(item => (<a key={item.label} href={item.href} className="text-gray-300 hover:text-white transition-colors text-sm font-medium">{item.label}</a>))}
+              </div>
+            )}
+          </div>
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <>
+                <button onClick={() => navigate('dashboard')} style={S.btnP} className="px-4 py-2 rounded-lg text-white text-sm font-medium">Dashboard</button>
+                <button onClick={handleLogout} className="text-gray-400 hover:text-white text-sm">Log out</button>
+              </>
+            ) : (
+              <a href={BOT_URL} target="_blank" rel="noopener noreferrer" style={S.btnP} className="px-4 py-2 rounded-lg text-white text-sm font-medium inline-flex items-center gap-2">
+                Start on Telegram <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
+          <button className="md:hidden text-gray-300" onClick={() => setMobileMenu(!mobileMenu)}>
+            {mobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+        {mobileMenu && (
+          <div className="md:hidden mt-4 pb-4 border-t border-white/5 pt-4 flex flex-col gap-3">
+            {!user && navItems.map(item => (<a key={item.label} href={item.href} onClick={() => setMobileMenu(false)} className="text-gray-300 hover:text-white text-sm font-medium py-2">{item.label}</a>))}
+            {user ? (
+              <>
+                <button onClick={() => { navigate('dashboard'); setMobileMenu(false); }} style={S.btnP} className="px-4 py-2.5 rounded-lg text-white text-sm font-medium">Dashboard</button>
+                <button onClick={() => { handleLogout(); setMobileMenu(false); }} className="text-gray-400 text-sm text-left py-2">Log out</button>
+              </>
+            ) : (
+              <a href={BOT_URL} target="_blank" rel="noopener noreferrer" style={S.btnP} className="px-4 py-2.5 rounded-lg text-white text-sm font-medium text-center">Start on Telegram</a>
+            )}
+          </div>
+        )}
       </nav>
 
-      {/* HERO */}
-      <section style={styles.hero}>
-        <div style={styles.heroInner}>
-          <div className="hero-badge" style={styles.heroBadge}>
-            AI-Powered Translation Bot
-          </div>
-          <h1 style={styles.heroTitle}>
-            Translate messages
-            <br />
-            <span style={styles.heroAccent}>in any Telegram chat</span>
-          </h1>
-          <p style={styles.heroSub}>
-            Add the bot to your group. It auto-translates every message between
-            languages — Vietnamese, English, Chinese, Japanese, Korean, and 15+
-            more. No commands needed. Just talk.
-          </p>
-
-          <div style={styles.heroCTAs}>
-            <a href={TELEGRAM_URL} style={styles.ctaPrimary} className="cta-hover">
-              <TelegramIcon /> Start on Telegram
-            </a>
-            <a href="#how" style={styles.ctaSecondary} className="cta-hover-alt">
-              How it works ↓
-            </a>
-          </div>
-
-          <div style={styles.heroProof}>
-            <span style={styles.heroProofDot} />
-            Free to try — 10k tokens on signup, no credit card
-          </div>
-
-          {error && <div style={styles.errorBanner}>{error}</div>}
-        </div>
-
-        {/* DEMO */}
-        <div style={styles.demoWrap}>
-          <ChatDemo />
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section id="how" style={styles.howSection}>
-        <h2 style={styles.howTitle}>Three steps. That's it.</h2>
-        <div style={styles.howGrid}>
-          <StepCard n="1" title="Add the bot" desc="Search @LinguaXYZBot on Telegram and add it to any group chat." />
-          <StepCard n="2" title="Set languages" desc="Use /setlang to pick language pairs (e.g. Vietnamese ↔ English)." />
-          <StepCard n="3" title="Just talk" desc="Every message gets translated automatically. No commands, no hassle." />
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer style={styles.footer}>
-        <span style={{ opacity: 0.5 }}>LinguaXYZ — Instant translation for Telegram</span>
-      </footer>
+      {currentPage === 'home' && <HomePage />}
+      {currentPage === 'dashboard' && (
+        <Dashboard
+          user={user}
+          inviteStats={inviteStats}
+          usageStats={usageStats}
+          pricing={pricing}
+          purchases={purchases}
+          showBuy={showBuy}
+          setShowBuy={setShowBuy}
+          purchaseSuccess={purchaseSuccess}
+          setPurchaseSuccess={setPurchaseSuccess}
+          onNavigate={navigate}
+          onRefresh={refreshData}
+        />
+      )}
     </div>
   );
 }
 
-function StepCard({ n, title, desc }) {
-  return (
-    <div style={styles.stepCard} className="step-card">
-      <div style={styles.stepNumber}>{n}</div>
-      <h3 style={styles.stepTitle}>{title}</h3>
-      <p style={styles.stepDesc}>{desc}</p>
-    </div>
-  );
-}
+// ============================================================================
+// CHAT DEMO ANIMATION
+// ============================================================================
 
 function ChatDemo() {
-  const messages = [
-    { name: "Linh", text: "Hôm nay ăn gì nhỉ?", translation: "What should we eat today?", flag: "🇻🇳", side: "left" },
-    { name: "Mike", text: "Let's get phở!", translation: "Mình đi ăn phở đi!", flag: "🇺🇸", side: "right" },
-    { name: "田中", text: "フォー大好き！", translation: "I love phở!", flag: "🇯🇵", side: "left" },
+  const conversations = [
+    { title: 'Vietnam Trip Planning 🌏', messages: [
+      { from: 'Minh', text: 'Các bạn nên đi thăm Hội An, rất đẹp!', translation: '🇺🇸 You guys should visit Hoi An, very beautiful!', side: 'left' },
+      { from: 'Sarah', text: "That sounds amazing! How do we get there from Hanoi?", translation: '🇻🇳 Nghe tuyệt vời quá! Làm sao để đi từ Hà Nội đến đó?', side: 'right' },
+      { from: 'Minh', text: 'Bay khoảng 1 tiếng từ Hà Nội đến Đà Nẵng, rồi đi taxi 30 phút', translation: '🇺🇸 Fly about 1 hour from Hanoi to Da Nang, then 30 min taxi', side: 'left' },
+    ]},
+    { title: 'Team Standup 💼', messages: [
+      { from: 'Yuki', text: '今日のタスクを共有します', translation: '🇺🇸 I will share today\'s tasks', side: 'left' },
+      { from: 'Carlos', text: 'Necesito ayuda con el diseño', translation: '🇺🇸 I need help with the design', side: 'right' },
+      { from: 'Yuki', text: 'デザインを手伝えますよ！', translation: '🇺🇸 I can help with the design!', side: 'left' },
+    ]},
+    { title: 'Language Exchange 🗣️', messages: [
+      { from: 'Pierre', text: "J'apprends le coréen, c'est difficile!", translation: '🇺🇸 I\'m learning Korean, it\'s difficult!', side: 'left' },
+      { from: 'Soo-jin', text: '프랑스어도 어려워요! 같이 연습해요', translation: '🇺🇸 French is difficult too! Let\'s practice together', side: 'right' },
+      { from: 'Pierre', text: "Bonne idée! On commence quand?", translation: '🇺🇸 Good idea! When do we start?', side: 'left' },
+    ]},
   ];
 
+  const [activeConvo, setActiveConvo] = useState(0);
+  const [visibleMessages, setVisibleMessages] = useState([]);
+  const [showTranslation, setShowTranslation] = useState({});
+
+  useEffect(() => {
+    setVisibleMessages([]);
+    setShowTranslation({});
+    const msgs = conversations[activeConvo].messages;
+    const timers = [];
+    msgs.forEach((_, i) => {
+      timers.push(setTimeout(() => setVisibleMessages(prev => [...prev, i]), i * 1500 + 500));
+      timers.push(setTimeout(() => setShowTranslation(prev => ({ ...prev, [i]: true })), i * 1500 + 1200));
+    });
+    const cycleTimer = setTimeout(() => setActiveConvo(prev => (prev + 1) % conversations.length), msgs.length * 1500 + 3000);
+    return () => { timers.forEach(clearTimeout); clearTimeout(cycleTimer); };
+  }, [activeConvo]);
+
+  const convo = conversations[activeConvo];
+
   return (
-    <div style={styles.demoPhone}>
-      <div style={styles.demoHeader}>
-        <span style={{ fontWeight: 700, fontSize: 14 }}>🌐 Travel Group</span>
-        <span style={{ opacity: 0.5, fontSize: 12 }}>3 members</span>
-      </div>
-      {messages.map((m, i) => (
-        <div key={i} style={{ ...styles.demoBubbleRow, justifyContent: m.side === "right" ? "flex-end" : "flex-start" }} className="demo-msg">
-          <div style={{ ...styles.demoBubble, ...(m.side === "right" ? styles.demoBubbleRight : {}) }}>
-            <div style={styles.demoName}>{m.flag} {m.name}</div>
-            <div style={styles.demoText}>{m.text}</div>
-            <div style={styles.demoTranslation}>↳ {m.translation}</div>
+    <div className="w-full max-w-lg mx-auto">
+      <div className="rounded-2xl overflow-hidden" style={{ ...S.card, border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="px-5 py-4 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+            <MessageCircle className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-white">{convo.title}</div>
+            <div className="text-xs text-gray-400">LinguaXYZ translating...</div>
           </div>
         </div>
-      ))}
+        <div className="p-4 space-y-4 min-h-[280px]">
+          {convo.messages.map((msg, i) => visibleMessages.includes(i) && (
+            <div key={`${activeConvo}-${i}`} className={`flex flex-col ${msg.side === 'right' ? 'items-end' : 'items-start'}`}
+              style={{ animation: 'fadeIn 0.4s ease-out' }}>
+              <span className="text-xs text-gray-500 mb-1 px-1">{msg.from}</span>
+              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${msg.side === 'right' ? 'bg-purple-500/30 text-purple-100' : 'bg-white/10 text-gray-200'}`}>
+                {msg.text}
+              </div>
+              {showTranslation[i] && (
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm mt-1 border bg-cyan-500/10 border-cyan-500/20 text-cyan-200`}
+                  style={{ animation: 'fadeIn 0.3s ease-out' }}>
+                  {msg.translation}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-wrap justify-center gap-4 mt-6 px-4">
+        {conversations.map((c, i) => (
+          <button key={i} onClick={() => setActiveConvo(i)}
+            className={`text-xs px-3 py-1.5 rounded-full transition-all ${i === activeConvo ? 'bg-purple-500/30 text-purple-300 border border-purple-500/40' : 'bg-white/5 text-gray-500 border border-transparent hover:text-gray-300'}`}>
+            {c.title}
+          </button>
+        ))}
+      </div>
+      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+    </div>
+  );
+}
+
+// ============================================================================
+// HOME PAGE — Telegram-first CTA
+// ============================================================================
+
+function HomePage() {
+  return (
+    <div>
+      {/* Hero */}
+      <div className="pt-32 pb-16 px-6 text-center">
+        <div className="max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-sm mb-8">
+            <Sparkles className="w-4 h-4" /> Powered by Claude AI
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            Translate chats<br /><span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">in real time</span>
+          </h1>
+          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+            Add LinguaXYZ to any Telegram chat. Everyone speaks their language — the bot translates instantly.
+            <span className="text-white"> 10k free tokens</span> — no signup needed.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
+              style={S.btnP} className="px-8 py-4 rounded-xl text-white font-semibold text-lg inline-flex items-center gap-2 no-underline">
+              Start on Telegram <ArrowRight className="w-5 h-5" />
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 mt-12 text-sm text-gray-500">
+            <div className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> No signup needed</div>
+            <div className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> 10k free tokens</div>
+            <div className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-400" /> 20+ languages</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Demo */}
+      <div className="py-16 px-6"><ChatDemo /></div>
+
+      {/* How It Works */}
+      <div id="howto" className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { icon: <MessageCircle className="w-6 h-6" />, title: 'Open the bot', desc: 'Click "Start on Telegram" — you get 10k tokens instantly' },
+              { icon: <UserPlus className="w-6 h-6" />, title: 'Add to any chat', desc: 'Add @linguaxyz_bot to a group or DM it directly' },
+              { icon: <Share2 className="w-6 h-6" />, title: 'Invite & earn', desc: 'Share your invite link — both of you get 10k tokens' },
+            ].map((s, i) => (
+              <div key={i} style={S.card} className="rounded-2xl p-6 text-center relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-xs font-bold">{i + 1}</div>
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mx-auto mb-4 text-purple-400">{s.icon}</div>
+                <h3 className="font-semibold mb-2">{s.title}</h3>
+                <p className="text-sm text-gray-400">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div id="features" className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Why LinguaXYZ?</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { icon: <Zap className="w-6 h-6" />, title: 'Instant Translation', desc: 'AI translates every message in real time — no delays', color: 'purple' },
+              { icon: <Globe className="w-6 h-6" />, title: '20+ Languages', desc: 'Vietnamese, English, Chinese, Japanese, Korean, and many more', color: 'cyan' },
+              { icon: <Gift className="w-6 h-6" />, title: 'Pay Per Use', desc: 'Only pay for what you use. Invite friends or buy tokens to keep going', color: 'green' },
+            ].map((f, i) => (
+              <div key={i} style={S.card} className="rounded-2xl p-6">
+                <div className={`w-12 h-12 rounded-xl bg-${f.color}-500/20 flex items-center justify-center mb-4 text-${f.color}-400`}>{f.icon}</div>
+                <h3 className="font-semibold text-lg mb-2">{f.title}</h3>
+                <p className="text-gray-400 text-sm">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="py-16 px-6 text-center">
+        <h2 className="text-3xl font-bold mb-4">Ready to break language barriers?</h2>
+        <p className="text-gray-400 mb-8">Start translating in seconds. No signup, no setup.</p>
+        <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
+          style={S.btnP} className="px-8 py-4 rounded-xl text-white font-semibold text-lg inline-flex items-center gap-2 no-underline">
+          Start on Telegram <ArrowRight className="w-5 h-5" />
+        </a>
+      </div>
+
+      {/* Footer */}
+      <div className="py-8 px-6 border-t border-white/5 text-center text-gray-500 text-sm">
+        © 2026 LinguaXYZ. Powered by Claude AI.
+      </div>
     </div>
   );
 }
@@ -227,267 +390,195 @@ function ChatDemo() {
 // DASHBOARD
 // ============================================================================
 
-function Dashboard({ data, onLogout, copied, setCopied }) {
-  const { user, inviteStats, usageStats, purchases } = data;
+function Dashboard({ user, inviteStats, usageStats, pricing, purchases, showBuy, setShowBuy, purchaseSuccess, setPurchaseSuccess, onNavigate, onRefresh }) {
+  const [copied, setCopied] = useState(null);
+  const [buyLoading, setBuyLoading] = useState(null);
 
-  const inviteLink = `https://t.me/${BOT_USERNAME}?start=ref_${user.inviteCode}`;
+  if (!user) { onNavigate('home'); return null; }
 
-  const copyInvite = useCallback(() => {
-    navigator.clipboard.writeText(inviteLink).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [inviteLink, setCopied]);
+  const totalInvites = inviteStats?.totalInvites || 0;
+  const totalTokensEarned = inviteStats?.totalTokensEarned || 0;
+  const totalMessages = usageStats?.totalMessages || 0;
+  const botInviteUrl = `https://t.me/linguaxyz_bot?start=ref_${user.inviteCode}`;
 
-  const balancePercent = Math.min(100, (user.balance / Math.max(user.balance, user.tokensUsed, 50000)) * 100);
+  const handleBuy = async (tierId) => {
+    setBuyLoading(tierId);
+    try {
+      const data = await apiFetch('/api/create-checkout', {
+        method: 'POST',
+        body: JSON.stringify({ tierId }),
+      });
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (e) {
+      alert(e.message || 'Failed to create checkout');
+    } finally {
+      setBuyLoading(null);
+    }
+  };
 
   return (
-    <div style={styles.dash}>
-      <style>{dashCSS}</style>
-
-      {/* TOP BAR */}
-      <header style={styles.dashHeader}>
-        <div style={styles.dashBrand}>
-          <span style={styles.navLogo}>語</span>
-          <span style={{ fontWeight: 700, fontSize: 18, color: "#e8e8ed" }}>LinguaXYZ</span>
-        </div>
-        <div style={styles.dashHeaderRight}>
-          <span style={styles.dashName}>{user.name}</span>
-          <button onClick={onLogout} style={styles.logoutBtn}>Log out</button>
-        </div>
-      </header>
-
-      <main style={styles.dashMain}>
-        <h1 style={styles.dashGreeting}>Welcome back, {user.name.split(" ")[0]}</h1>
-
-        {/* STAT CARDS */}
-        <div style={styles.statGrid}>
-          <StatCard label="Balance" value={formatTokens(user.balance)} sub={`${formatTokens(user.tokensUsed)} used`} color="#10b981" icon="⚡" />
-          <StatCard label="Translations" value={usageStats.totalMessages.toLocaleString()} sub={`${formatTokens(usageStats.totalTokens)} tokens`} color="#6366f1" icon="💬" />
-          <StatCard label="Referrals" value={inviteStats.totalInvites} sub={`+${formatTokens(inviteStats.totalTokensEarned)} earned`} color="#f59e0b" icon="👥" />
-        </div>
-
-        {/* BALANCE BAR */}
-        <div style={styles.balanceSection}>
-          <div style={styles.balanceBarTrack}>
-            <div style={{ ...styles.balanceBarFill, width: `${balancePercent}%` }} />
+    <div className="min-h-screen pt-24 pb-12 px-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-1">Hi, {user.name}! 👋</h1>
+            <p className="text-gray-400">Your translation dashboard</p>
           </div>
-          <div style={styles.balanceLabels}>
-            <span>{formatTokens(user.balance)} remaining</span>
-            <span style={{ opacity: 0.5 }}>Need more? Use /buy in the bot</span>
-          </div>
+          <button onClick={onRefresh} style={S.btnS} className="px-4 py-2.5 rounded-xl font-medium flex items-center gap-2 text-sm text-white">
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
         </div>
 
-        {/* INVITE SECTION */}
-        <div style={styles.inviteSection}>
-          <h2 style={styles.sectionTitle}>Invite friends, earn tokens</h2>
-          <p style={styles.sectionSub}>
-            Both you and your friend get <strong>10,000 tokens</strong> when they join.
-          </p>
-          <div style={styles.inviteLinkRow}>
-            <input
-              readOnly
-              value={inviteLink}
-              style={styles.inviteInput}
-              onFocus={(e) => e.target.select()}
-            />
-            <button onClick={copyInvite} style={styles.copyBtn} className="cta-hover">
-              {copied ? "✓ Copied" : "Copy"}
-            </button>
-          </div>
-        </div>
-
-        {/* PURCHASE HISTORY */}
-        {purchases && purchases.length > 0 && (
-          <div style={styles.historySection}>
-            <h2 style={styles.sectionTitle}>Purchase history</h2>
-            <div style={styles.historyList}>
-              {purchases.map((p, i) => (
-                <div key={i} style={styles.historyRow}>
-                  <span style={styles.historyAmount}>${p.amount}</span>
-                  <span style={styles.historyTokens}>+{formatTokens(p.tokens)} tokens</span>
-                  <span style={styles.historyDate}>{timeAgo(p.date)}</span>
-                </div>
-              ))}
-            </div>
+        {/* Purchase success */}
+        {purchaseSuccess && (
+          <div className="mb-6 px-5 py-4 rounded-xl flex items-center gap-3" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)' }}>
+            <Check className="w-5 h-5 text-green-400" />
+            <span className="text-sm text-green-300 font-medium">Payment successful! Your tokens have been added.</span>
+            <button onClick={() => { setPurchaseSuccess(false); onRefresh(); }} className="ml-auto text-green-400 text-xs hover:underline">Dismiss</button>
           </div>
         )}
 
-        {/* MEMBER SINCE */}
-        <div style={styles.memberSince}>
-          Member since {new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div style={S.card} className="rounded-2xl p-5">
+            <div className="text-sm text-gray-400 mb-1">Balance</div>
+            <div className={`text-2xl font-bold ${user.balance < 1000 ? 'text-orange-400' : 'text-green-400'}`}>{formatTokens(user.balance)}</div>
+            <div className="text-xs text-gray-500 mt-1">tokens</div>
+          </div>
+          <div style={S.card} className="rounded-2xl p-5">
+            <div className="text-sm text-gray-400 mb-1">Tokens Used</div>
+            <div className="text-2xl font-bold">{formatTokens(user.tokensUsed || 0)}</div>
+            <div className="text-xs text-gray-500 mt-1">total</div>
+          </div>
+          <div style={S.card} className="rounded-2xl p-5">
+            <div className="text-sm text-gray-400 mb-1">Friends Invited</div>
+            <div className="text-2xl font-bold text-purple-400">{totalInvites}</div>
+            <div className="text-xs text-gray-500 mt-1">referrals</div>
+          </div>
+          <div style={S.card} className="rounded-2xl p-5">
+            <div className="text-sm text-gray-400 mb-1">Messages</div>
+            <div className="text-2xl font-bold text-cyan-400">{totalMessages}</div>
+            <div className="text-xs text-gray-500 mt-1">translated</div>
+          </div>
         </div>
-      </main>
+
+        {/* Low balance warning */}
+        {user.balance < 1000 && (
+          <div className="mb-6 px-5 py-4 rounded-xl flex items-start gap-3" style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.3)' }}>
+            <AlertCircle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <span className="text-sm text-orange-300 font-medium">Low balance!</span>
+              <span className="text-sm text-orange-300/70 ml-1">You have {formatTokens(user.balance)} tokens left.</span>
+            </div>
+            <button onClick={() => setShowBuy(true)} style={S.btnP} className="px-4 py-2 rounded-lg text-white text-xs font-medium shrink-0">
+              Buy Tokens
+            </button>
+          </div>
+        )}
+
+        {/* Buy Tokens */}
+        <div style={S.card} className="rounded-2xl p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-green-400" /> Buy Tokens
+            </h2>
+            {!showBuy && (
+              <button onClick={() => setShowBuy(true)} className="text-sm text-purple-400 hover:text-purple-300">View pricing →</button>
+            )}
+          </div>
+          {showBuy ? (
+            <div className="grid md:grid-cols-3 gap-4">
+              {pricing.map((tier, i) => (
+                <div key={tier.id} className={`rounded-xl p-5 text-center relative ${i === 1 ? 'ring-2 ring-purple-500/50' : ''}`}
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  {i === 1 && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-purple-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Popular</div>}
+                  <div className="text-2xl font-bold mb-1">{tier.priceLabel}</div>
+                  <div className="text-sm text-gray-400 mb-4">{tier.label}</div>
+                  <button
+                    onClick={() => handleBuy(tier.id)}
+                    disabled={buyLoading === tier.id}
+                    style={i === 1 ? S.btnP : S.btnS}
+                    className="w-full py-3 rounded-xl text-sm font-medium text-white"
+                  >
+                    {buyLoading === tier.id ? <RefreshCw className="w-4 h-4 animate-spin mx-auto" /> : 'Buy Now'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-sm">Need more tokens? Purchase securely with Stripe.</p>
+          )}
+          {purchases.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-white/5">
+              <div className="text-xs text-gray-500 mb-2">Recent purchases</div>
+              {purchases.slice(0, 3).map((p, i) => (
+                <div key={i} className="flex items-center justify-between text-xs text-gray-400 py-1">
+                  <span>${p.amount} — {formatTokens(p.tokens)} tokens</span>
+                  <span>{new Date(p.date).toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Invite Friends */}
+        <div style={S.card} className="rounded-2xl p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-cyan-400" /> Invite Friends — Earn 10k Tokens
+          </h2>
+          <p className="text-gray-400 text-sm mb-4">Share your invite link. When a friend clicks it and starts the bot, you both get 10,000 tokens instantly!</p>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 px-4 py-3 rounded-xl text-sm font-mono truncate" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              {botInviteUrl}
+            </div>
+            <button
+              onClick={() => { navigator.clipboard.writeText(botInviteUrl); setCopied('invite'); setTimeout(() => setCopied(null), 2000); }}
+              className="px-4 py-3 rounded-xl text-sm font-medium text-white shrink-0"
+              style={S.btnP}
+            >
+              {copied === 'invite' ? '✓ Copied!' : 'Copy Link'}
+            </button>
+          </div>
+          {totalInvites > 0 && (
+            <div className="mt-4 text-sm text-gray-400">
+              ✅ {totalInvites} friend{totalInvites !== 1 ? 's' : ''} invited · {formatTokens(totalTokensEarned)} tokens earned
+            </div>
+          )}
+        </div>
+
+        {/* How to get tokens */}
+        <div style={S.card} className="rounded-2xl p-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Gift className="w-5 h-5 text-green-400" /> How to Get Tokens
+          </h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { icon: <Share2 className="w-5 h-5" />, title: 'Invite friends', desc: 'Both of you get 10k tokens free', color: 'cyan' },
+              { icon: <CreditCard className="w-5 h-5" />, title: 'Buy tokens', desc: 'Instant top-up with Stripe', color: 'green' },
+              { icon: <MessageCircle className="w-5 h-5" />, title: 'Use /buy in bot', desc: 'Purchase directly from Telegram', color: 'purple' },
+            ].map((s, i) => (
+              <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                <div className={`w-8 h-8 rounded-lg bg-${s.color}-500/20 flex items-center justify-center text-${s.color}-400 shrink-0`}>{s.icon}</div>
+                <div>
+                  <div className="font-medium text-sm">{s.title}</div>
+                  <div className="text-xs text-gray-400">{s.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function StatCard({ label, value, sub, color, icon }) {
+export default function App() {
   return (
-    <div style={styles.statCard} className="stat-card">
-      <div style={{ ...styles.statIcon, background: `${color}18` }}>
-        <span style={{ fontSize: 20 }}>{icon}</span>
-      </div>
-      <div>
-        <div style={styles.statValue}>{value}</div>
-        <div style={styles.statLabel}>{label}</div>
-        <div style={styles.statSub}>{sub}</div>
-      </div>
-    </div>
+    <ErrorBoundary>
+      <AppInner />
+    </ErrorBoundary>
   );
 }
-
-function TelegramIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: 8, flexShrink: 0 }}>
-      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-    </svg>
-  );
-}
-
-// ============================================================================
-// STYLES
-// ============================================================================
-
-const font = "'DM Sans', 'Helvetica Neue', sans-serif";
-const fontDisplay = "'Instrument Serif', Georgia, serif";
-const bg = "#0a0a0f";
-const surface = "#13131a";
-const border = "#1e1e2a";
-const text1 = "#e8e8ed";
-const text2 = "#8888a0";
-const accent = "#6366f1";
-const green = "#10b981";
-
-const styles = {
-  // Loading
-  loadingWrap: { display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: bg },
-  loadingPulse: { animation: "pulse 1.5s ease-in-out infinite" },
-  loadingIcon: { fontSize: 48 },
-
-  // Landing
-  landing: { minHeight: "100vh", background: bg, color: text1, fontFamily: font, overflowX: "hidden" },
-  nav: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 32px", maxWidth: 1100, margin: "0 auto" },
-  navBrand: { display: "flex", alignItems: "center", gap: 10 },
-  navLogo: { fontSize: 24, fontWeight: 700, background: `linear-gradient(135deg, ${accent}, #a78bfa)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
-  navName: { fontWeight: 700, fontSize: 18 },
-
-  hero: { maxWidth: 1100, margin: "0 auto", padding: "60px 32px 80px", display: "grid", gridTemplateColumns: "1fr 380px", gap: 60, alignItems: "center" },
-  heroInner: {},
-  heroBadge: { display: "inline-block", padding: "6px 14px", borderRadius: 99, border: `1px solid ${border}`, fontSize: 13, color: text2, marginBottom: 24, letterSpacing: 0.3 },
-  heroTitle: { fontSize: "clamp(36px, 5vw, 56px)", fontFamily: fontDisplay, fontWeight: 400, lineHeight: 1.1, margin: "0 0 20px" },
-  heroAccent: { background: `linear-gradient(90deg, ${accent}, #a78bfa, ${green})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
-  heroSub: { fontSize: 17, lineHeight: 1.6, color: text2, maxWidth: 480, margin: "0 0 32px" },
-  heroCTAs: { display: "flex", gap: 14, flexWrap: "wrap" },
-  ctaPrimary: { display: "inline-flex", alignItems: "center", padding: "14px 28px", borderRadius: 12, background: accent, color: "#fff", fontWeight: 600, fontSize: 15, textDecoration: "none", transition: "all .2s", border: "none", cursor: "pointer" },
-  ctaSecondary: { display: "inline-flex", alignItems: "center", padding: "14px 28px", borderRadius: 12, background: "transparent", color: text2, fontWeight: 500, fontSize: 15, textDecoration: "none", border: `1px solid ${border}`, transition: "all .2s", cursor: "pointer" },
-  heroProof: { marginTop: 20, fontSize: 13, color: text2, display: "flex", alignItems: "center", gap: 8 },
-  heroProofDot: { width: 6, height: 6, borderRadius: "50%", background: green, flexShrink: 0 },
-  errorBanner: { marginTop: 20, padding: "12px 16px", borderRadius: 10, background: "#ef44441a", border: "1px solid #ef444433", color: "#f87171", fontSize: 14 },
-
-  demoWrap: { display: "flex", justifyContent: "center" },
-  demoPhone: { width: 340, background: surface, borderRadius: 20, border: `1px solid ${border}`, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" },
-  demoHeader: { padding: "16px 20px", borderBottom: `1px solid ${border}`, display: "flex", justifyContent: "space-between", alignItems: "center" },
-  demoBubbleRow: { display: "flex", padding: "6px 16px" },
-  demoBubble: { maxWidth: "80%", padding: "10px 14px", borderRadius: "14px 14px 14px 4px", background: "#1a1a28", marginBottom: 2 },
-  demoBubbleRight: { borderRadius: "14px 14px 4px 14px", background: "#1c1c3a" },
-  demoName: { fontSize: 12, fontWeight: 600, marginBottom: 4, opacity: 0.7 },
-  demoText: { fontSize: 14, lineHeight: 1.4 },
-  demoTranslation: { fontSize: 12, color: "#6366f1", marginTop: 4, fontStyle: "italic" },
-
-  // How it works
-  howSection: { maxWidth: 1100, margin: "0 auto", padding: "80px 32px 100px" },
-  howTitle: { fontSize: "clamp(28px, 4vw, 40px)", fontFamily: fontDisplay, fontWeight: 400, textAlign: "center", marginBottom: 48 },
-  howGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 },
-  stepCard: { background: surface, border: `1px solid ${border}`, borderRadius: 16, padding: "32px 28px", transition: "border-color .2s" },
-  stepNumber: { width: 36, height: 36, borderRadius: "50%", background: `${accent}18`, color: accent, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 15, marginBottom: 16 },
-  stepTitle: { fontSize: 18, fontWeight: 600, marginBottom: 8, fontFamily: font },
-  stepDesc: { fontSize: 14, color: text2, lineHeight: 1.5, margin: 0 },
-
-  footer: { textAlign: "center", padding: "32px", fontSize: 13, color: text2, borderTop: `1px solid ${border}` },
-
-  // Dashboard
-  dash: { minHeight: "100vh", background: bg, color: text1, fontFamily: font },
-  dashHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 32px", borderBottom: `1px solid ${border}`, background: surface },
-  dashBrand: { display: "flex", alignItems: "center", gap: 10 },
-  dashHeaderRight: { display: "flex", alignItems: "center", gap: 16 },
-  dashName: { fontSize: 14, color: text2 },
-  logoutBtn: { padding: "6px 14px", borderRadius: 8, border: `1px solid ${border}`, background: "transparent", color: text2, fontSize: 13, cursor: "pointer", transition: "all .2s" },
-  dashMain: { maxWidth: 720, margin: "0 auto", padding: "40px 24px 80px" },
-  dashGreeting: { fontSize: "clamp(24px, 4vw, 32px)", fontFamily: fontDisplay, fontWeight: 400, marginBottom: 32 },
-
-  statGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 32 },
-  statCard: { background: surface, border: `1px solid ${border}`, borderRadius: 14, padding: "20px 22px", display: "flex", alignItems: "center", gap: 16, transition: "border-color .2s" },
-  statIcon: { width: 44, height: 44, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  statValue: { fontSize: 22, fontWeight: 700 },
-  statLabel: { fontSize: 13, color: text2, fontWeight: 500 },
-  statSub: { fontSize: 12, color: text2, opacity: 0.6 },
-
-  balanceSection: { marginBottom: 32 },
-  balanceBarTrack: { height: 6, borderRadius: 3, background: border },
-  balanceBarFill: { height: "100%", borderRadius: 3, background: `linear-gradient(90deg, ${green}, ${accent})`, transition: "width .5s ease" },
-  balanceLabels: { display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 13, color: text2 },
-
-  inviteSection: { background: surface, border: `1px solid ${border}`, borderRadius: 16, padding: "28px 24px", marginBottom: 32 },
-  sectionTitle: { fontSize: 18, fontWeight: 600, marginBottom: 6, fontFamily: font },
-  sectionSub: { fontSize: 14, color: text2, lineHeight: 1.5, marginBottom: 16 },
-  inviteLinkRow: { display: "flex", gap: 10 },
-  inviteInput: { flex: 1, padding: "10px 14px", borderRadius: 10, border: `1px solid ${border}`, background: bg, color: text1, fontSize: 13, fontFamily: "monospace", outline: "none" },
-  copyBtn: { padding: "10px 20px", borderRadius: 10, background: accent, color: "#fff", fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer", transition: "all .2s", whiteSpace: "nowrap" },
-
-  historySection: { background: surface, border: `1px solid ${border}`, borderRadius: 16, padding: "28px 24px", marginBottom: 32 },
-  historyList: {},
-  historyRow: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${border}` },
-  historyAmount: { fontWeight: 600, fontSize: 15 },
-  historyTokens: { color: green, fontSize: 14 },
-  historyDate: { color: text2, fontSize: 13 },
-
-  memberSince: { textAlign: "center", fontSize: 13, color: text2, opacity: 0.5, marginTop: 16 },
-};
-
-// ============================================================================
-// CSS ANIMATIONS & RESPONSIVE
-// ============================================================================
-
-const landingCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: ${bg}; margin: 0; -webkit-font-smoothing: antialiased; }
-
-  .cta-hover:hover { transform: translateY(-1px); filter: brightness(1.1); }
-  .cta-hover-alt:hover { border-color: ${accent} !important; color: ${text1} !important; }
-  .step-card:hover { border-color: ${accent}44 !important; }
-  .stat-card:hover { border-color: ${accent}44 !important; }
-
-  .demo-msg { animation: fadeUp 0.5s ease both; }
-  .demo-msg:nth-child(2) { animation-delay: 0.15s; }
-  .demo-msg:nth-child(3) { animation-delay: 0.3s; }
-  .demo-msg:nth-child(4) { animation-delay: 0.45s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @media (max-width: 768px) {
-    section[style] { grid-template-columns: 1fr !important; }
-    nav { padding: 16px 20px !important; }
-    section { padding-left: 20px !important; padding-right: 20px !important; }
-  }
-`;
-
-const dashCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: ${bg}; margin: 0; -webkit-font-smoothing: antialiased; }
-
-  .cta-hover:hover { transform: translateY(-1px); filter: brightness(1.1); }
-  .stat-card:hover { border-color: ${accent}44 !important; }
-
-  @media (max-width: 640px) {
-    main { padding-left: 16px !important; padding-right: 16px !important; }
-    header { padding: 14px 16px !important; }
-  }
-`;
