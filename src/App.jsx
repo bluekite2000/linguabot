@@ -72,6 +72,7 @@ function AppInner() {
   const [loading, setLoading] = useState(true);
   const [showBuy, setShowBuy] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const refreshData = async () => {
     try {
@@ -137,7 +138,6 @@ function AppInner() {
   if (loading) return <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center text-white">Loading...</div>;
 
   const navItems = [{ label: 'Features', href: '#features' }, { label: 'How It Works', href: '#howto' }];
-  const [mobileMenu, setMobileMenu] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
