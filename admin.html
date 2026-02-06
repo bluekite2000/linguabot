@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaXYZ Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --bg: #08080f;
+    --surface: rgba(255,255,255,0.04);
+    --surface2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --text: #e4e4e7;
+    --muted: #71717a;
+    --purple: #a855f7;
+    --cyan: #06b6d4;
+    --green: #22c55e;
+    --orange: #fb923c;
+    --red: #ef4444;
+    --blue: #3b82f6;
+  }
+  
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  
+  .app { display: flex; min-height: 100vh; }
+  
+  .sidebar {
+    width: 240px;
+    background: rgba(255,255,255,0.02);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px;
+    margin-bottom: 32px;
+  }
+  
+  .logo-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  
+  .logo-text { font-weight: 700; font-size: 16px; }
+  .logo-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--purple);
+    color: white;
+    font-weight: 600;
+    margin-left: auto;
+  }
+  
+  .nav { list-style: none; flex: 1; }
+  .nav li {
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    transition: all 0.15s;
+  }
+  .nav li:hover { background: var(--surface2); color: var(--text); }
+  .nav li.active { background: rgba(168,85,247,0.12); color: var(--purple); }
+  
+  .main { margin-left: 240px; flex: 1; padding: 32px; }
+  
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 800; }
+  .stat-value.purple { color: var(--purple); }
+  .stat-value.cyan { color: var(--cyan); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.blue { color: var(--blue); }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    white-space: nowrap;
+  }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody tr:last-child td { border-bottom: none; }
+  
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .badge-cyan { background: rgba(6,182,212,0.15); color: var(--cyan); }
+  .badge-orange { background: rgba(251,146,60,0.15); color: var(--orange); }
+  
+  .btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-purple { background: var(--purple); color: white; }
+  .btn-purple:hover { background: #9333ea; }
+  .btn-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-red:hover { background: rgba(239,68,68,0.25); }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  
+  .search-input {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--purple); }
+  .search-input::placeholder { color: var(--muted); }
+  
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  .modal {
+    background: #18181b;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 420px;
+    max-width: 90vw;
+  }
+  .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+  .modal label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .modal input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 16px;
+  }
+  .modal input:focus { border-color: var(--purple); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+  
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 200;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast-success { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .toast-error { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  
+  .login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .login-card { width: 380px; text-align: center; }
+  .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-header h1 { font-size: 24px; font-weight: 800; }
+  .page-header .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  
+  .health-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .health-dot.ok { background: var(--green); box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+  .health-dot.down { background: var(--red); box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+  
+  .mono { font-family: monospace; font-size: 12px; }
+  .text-right { text-align: right; }
+  
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const API = 'https://api.nhomnhom.com';
+let SECRET = localStorage.getItem('admin_secret') || '';
+let currentTab = 'overview';
+let data = { users: [], groups: [], health: null };
+let searchQuery = '';
+let modal = null;
+let toast = null;
+
+async function apiGet(path) {
+  const sep = path.includes('?') ? '&' : '?';
+  const res = await fetch(`${API}${path}${sep}secret=${SECRET}`);
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+async function apiPost(path, body) {
+  const res = await fetch(`${API}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret: SECRET, ...body }),
+  });
+  if (!res.ok) throw new Error((await res.json()).error || res.status);
+  return res.json();
+}
+
+function showToast(msg, type = 'success') {
+  toast = { msg, type };
+  render();
+  setTimeout(() => { toast = null; render(); }, 3000);
+}
+
+async function loadData() {
+  try {
+    const [users, groups, health] = await Promise.all([
+      apiGet('/api/admin/users'),
+      apiGet('/api/admin/groups'),
+      fetch(`${API}/health`).then(r => r.json()).catch(() => null),
+    ]);
+    data.users = users.users || [];
+    data.groups = groups.groups || [];
+    data.health = health;
+    render();
+  } catch (e) {
+    showToast('Failed to load: ' + e.message, 'error');
+  }
+}
+
+async function addHours(email) {
+  modal = {
+    title: `Add Hours — ${email}`,
+    fields: [{ name: 'hours', label: 'Hours to add', type: 'number', value: '1' }],
+    action: async (vals) => {
+      await apiPost('/api/admin/add-hours', { email, hours: parseFloat(vals.hours) });
+      showToast(`Added ${vals.hours}h to ${email}`);
+      loadData();
+    }
+  };
+  render();
+}
+
+async function setBalance(email, bal) {
+  modal = {
+    title: `Set Balance — ${email}`,
+    fields: [{ name: 'balance', label: 'New balance (hours)', type: 'number', value: String(bal) }],
+    action: async (vals) => {
+      await apiPost('/api/admin/set-balance', { email, balance: parseFloat(vals.balance) });
+      showToast(`Set ${email} balance to ${vals.balance}h`);
+      loadData();
+    }
+  };
+  render();
+}
+
+async function deleteUser(email) {
+  if (!confirm(`Delete ${email}? This removes all their data.`)) return;
+  try {
+    await apiPost('/api/admin/delete-user', { email });
+    showToast(`Deleted ${email}`);
+    loadData();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+function timeAgo(d) {
+  if (!d) return '—';
+  const s = Math.floor((Date.now() - new Date(d)) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  if (s < 2592000) return `${Math.floor(s/86400)}d ago`;
+  return new Date(d).toLocaleDateString();
+}
+
+function uptime(s) {
+  if (!s) return '—';
+  const d = Math.floor(s/86400), h = Math.floor((s%86400)/3600), m = Math.floor((s%3600)/60);
+  return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
+
+function render() {
+  const app = document.getElementById('app');
+  if (!SECRET) { app.innerHTML = renderLogin(); return; }
+  app.innerHTML = `
+    <div class="app">
+      ${renderSidebar()}
+      <div class="main">
+        <div class="tab-content ${currentTab==='overview'?'active':''}">${renderOverview()}</div>
+        <div class="tab-content ${currentTab==='users'?'active':''}">${renderUsers()}</div>
+        <div class="tab-content ${currentTab==='groups'?'active':''}">${renderGroups()}</div>
+      </div>
+    </div>
+    ${modal ? renderModal() : ''}
+    ${toast ? `<div class="toast toast-${toast.type}">${toast.msg}</div>` : ''}
+  `;
+  if (currentTab === 'users' && searchQuery) {
+    const i = document.getElementById('user-search');
+    if (i) { i.focus(); i.selectionStart = i.selectionEnd = i.value.length; }
+  }
+}
+
+function renderLogin() {
+  return `<div class="login-page"><div class="login-card card">
+    <div class="logo" style="justify-content:center;margin-bottom:20px">
+      <div class="logo-icon">🌐</div><span class="logo-text">LinguaXYZ</span><span class="logo-badge">ADMIN</span>
+    </div>
+    <p>Enter your admin secret to continue</p>
+    <input class="search-input" id="secret-input" type="password" placeholder="Admin secret..." style="width:100%;margin-bottom:16px" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-purple" style="width:100%;padding:12px" onclick="doLogin()">Sign In</button>
+  </div></div>`;
+}
+
+function renderSidebar() {
+  const tabs = [
+    { id:'overview', icon:'📊', label:'Overview' },
+    { id:'users', icon:'👤', label:'Users' },
+    { id:'groups', icon:'💬', label:'Groups' },
+  ];
+  return `<div class="sidebar">
+    <div class="logo"><div class="logo-icon">🌐</div><span class="logo-text">LinguaXYZ</span><span class="logo-badge">ADMIN</span></div>
+    <ul class="nav">${tabs.map(t=>`<li class="${currentTab===t.id?'active':''}" onclick="switchTab('${t.id}')"><span>${t.icon}</span> ${t.label}</li>`).join('')}</ul>
+    <div style="padding:8px 12px;font-size:12px;color:var(--muted)"><span class="health-dot ${data.health?'ok':'down'}"></span>${data.health?'API Online':'API Offline'}</div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="doLogout()">Sign Out</button>
+  </div>`;
+}
+
+function renderOverview() {
+  const h = data.health || {};
+  const totalBalance = data.users.reduce((s,u) => s+(u.balance||0), 0);
+  const totalUsed = data.users.reduce((s,u) => s+(u.hours_used||0), 0);
+  const totalReferrals = data.users.reduce((s,u) => s+(u.referrals||0), 0);
+  const activeGroups = data.groups.filter(g => g.active).length;
+  const totalMsgs = data.groups.reduce((s,g) => s+(g.messages||0), 0);
+  
+  return `
+    <div class="page-header"><div><h1>Dashboard</h1><div class="sub">${data.users.length} users · ${data.groups.length} groups · ${uptime(h.uptime)} uptime</div></div>
+    <button class="btn btn-ghost" onclick="loadData()">↻ Refresh</button></div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value purple">${data.users.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Active Groups</div><div class="stat-value cyan">${activeGroups}</div></div>
+      <div class="stat-card"><div class="stat-label">Messages</div><div class="stat-value blue">${totalMsgs.toLocaleString()}</div></div>
+      <div class="stat-card"><div class="stat-label">Referrals</div><div class="stat-value green">${totalReferrals}</div></div>
+      <div class="stat-card"><div class="stat-label">Hours Used</div><div class="stat-value orange">${totalUsed.toFixed(1)}h</div></div>
+      <div class="stat-card"><div class="stat-label">Balance Pool</div><div class="stat-value">${totalBalance.toFixed(1)}h</div></div>
+    </div>
+    <div class="card"><h3 style="font-size:16px;font-weight:700;margin-bottom:16px">Recent Users</h3>
+    <div class="table-wrap"><table><thead><tr><th>User</th><th>Balance</th><th>Referrals</th><th>Invite Code</th><th>Joined</th></tr></thead><tbody>
+    ${data.users.slice(0,8).map(u=>`<tr>
+      <td><div style="font-weight:600">${esc(u.name||'—')}</div><div style="font-size:11px;color:var(--muted)">${esc(u.email)}</div></td>
+      <td><span class="badge ${u.balance<=1?'badge-orange':'badge-green'}">${u.balance}h</span></td>
+      <td>${u.referrals>0?`<span class="badge badge-purple">${u.referrals}</span>`:'<span style="color:var(--muted)">0</span>'}</td>
+      <td><span class="mono" style="color:var(--cyan)">${u.invite_code||'—'}</span></td>
+      <td style="color:var(--muted)">${timeAgo(u.created_at)}</td>
+    </tr>`).join('')}
+    </tbody></table></div></div>`;
+}
+
+function renderUsers() {
+  const q = searchQuery.toLowerCase();
+  const filtered = q ? data.users.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)||(u.invite_code||'').toLowerCase().includes(q)) : data.users;
+  return `
+    <div class="page-header"><div><h1>Users</h1><div class="sub">${filtered.length} of ${data.users.length}</div></div></div>
+    <div style="margin-bottom:20px"><input class="search-input" id="user-search" placeholder="Search by name, email, or invite code..." value="${esc(searchQuery)}" oninput="searchQuery=this.value;render()" style="width:100%"></div>
+    <div class="table-wrap"><table><thead><tr><th>User</th><th>Balance</th><th>Used</th><th>Earned</th><th>Referrals</th><th>Invite Code</th><th>Telegram</th><th>Joined</th><th class="text-right">Actions</th></tr></thead><tbody>
+    ${filtered.map(u=>`<tr>
+      <td><div style="font-weight:600">${esc(u.name||'—')}</div><div style="font-size:11px;color:var(--muted)">${esc(u.email)}</div></td>
+      <td><span class="badge ${u.balance<=0?'badge-red':u.balance<=1?'badge-orange':'badge-green'}">${u.balance}h</span></td>
+      <td style="color:var(--muted)">${(u.hours_used||0).toFixed(1)}h</td>
+      <td style="color:var(--cyan)">${(u.hours_earned||0).toFixed(1)}h</td>
+      <td>${u.referrals>0?`<span class="badge badge-purple">${u.referrals}</span>`:'<span style="color:var(--muted)">0</span>'}</td>
+      <td><span class="mono" style="color:var(--cyan)">${u.invite_code||'—'}</span></td>
+      <td>${u.telegram_id?'<span class="badge badge-green">linked</span>':'<span style="color:var(--muted)">—</span>'}</td>
+      <td style="color:var(--muted)">${timeAgo(u.created_at)}</td>
+      <td class="text-right" style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="addHours('${esc(u.email)}')">+ Hours</button>
+        <button class="btn btn-ghost btn-sm" onclick="setBalance('${esc(u.email)}',${u.balance})">Set</button>
+        <button class="btn btn-red btn-sm" onclick="deleteUser('${esc(u.email)}')">✕</button>
+      </td>
+    </tr>`).join('')}
+    ${filtered.length===0?'<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">No users found</td></tr>':''}
+    </tbody></table></div>`;
+}
+
+function renderGroups() {
+  return `
+    <div class="page-header"><div><h1>Groups</h1><div class="sub">${data.groups.length} groups · ${data.groups.filter(g=>g.active).length} active</div></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Group</th><th>Owner</th><th>Status</th><th>Messages</th><th>Members</th><th>Languages</th><th>Invite Code</th><th>Linked</th></tr></thead><tbody>
+    ${data.groups.map(g=>{
+      let langs='—';
+      try{const p=JSON.parse(g.language_pairs||'[]');langs=p.map(p=>p[0]+'→'+p[1]).join(', ');}catch(e){}
+      return `<tr>
+        <td style="font-weight:600">${esc(g.group_name||'Unnamed')}</td>
+        <td style="color:var(--muted);font-size:12px">${esc(g.owner_email)}</td>
+        <td><span class="badge ${g.active?'badge-green':'badge-red'}">${g.active?'Active':'Paused'}</span></td>
+        <td>${(g.messages||0).toLocaleString()}</td>
+        <td>${g.members||0}</td>
+        <td><span class="mono" style="font-size:11px">${langs}</span></td>
+        <td><span class="mono" style="color:var(--cyan)">${g.invite_code||'—'}</span></td>
+        <td style="color:var(--muted)">${timeAgo(g.linked_at)}</td>
+      </tr>`;
+    }).join('')}
+    ${data.groups.length===0?'<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">No groups yet</td></tr>':''}
+    </tbody></table></div>`;
+}
+
+function renderModal() {
+  return `<div class="modal-overlay" onclick="if(event.target===this){modal=null;render()}"><div class="modal">
+    <h3>${modal.title}</h3>
+    ${modal.fields.map(f=>`<label>${f.label}</label><input type="${f.type||'text'}" id="modal-${f.name}" value="${f.value||''}" onkeydown="if(event.key==='Enter')submitModal()">`).join('')}
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="modal=null;render()">Cancel</button><button class="btn btn-purple" onclick="submitModal()">Confirm</button></div>
+  </div></div>`;
+}
+
+function switchTab(t) { currentTab=t; render(); }
+function doLogin() { SECRET=document.getElementById('secret-input').value; if(!SECRET)return; localStorage.setItem('admin_secret',SECRET); render(); loadData(); }
+function doLogout() { SECRET=''; localStorage.removeItem('admin_secret'); data={users:[],groups:[],health:null}; render(); }
+async function submitModal() {
+  if(!modal)return;
+  const vals={};
+  modal.fields.forEach(f=>{vals[f.name]=document.getElementById(`modal-${f.name}`).value;});
+  try{await modal.action(vals);modal=null;render();}catch(e){showToast(e.message,'error');}
+}
+
+render();
+if(SECRET)loadData();
+</script>
+</body>
+</html>
