@@ -638,6 +638,7 @@ function HomePage() {
                     ['/review', 'Spaced repetition review'],
                     ['/progress', 'Detailed stats'],
                     ['/stop', 'End current session'],
+                    ['/schedule', 'Set weekly class schedule'],
                     ['?word', 'Inline word lookup'],
                   ]},
                   { title: 'Account', cmds: [
