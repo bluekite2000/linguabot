@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, Component } from 'react';
 import {
   Check, Globe, MessageCircle, Zap, Users, Menu, X, ArrowRight, RefreshCw,
-  Gift, Sparkles, AlertCircle, Share2, UserPlus, CreditCard, ExternalLink,
-  BookOpen, Brain, Mic, Trophy, ChevronDown, ChevronRight, Star, Target,
-  Flame, GraduationCap, Repeat, Gamepad2, MessageSquare, Bot,
+  Gift, Sparkles, AlertCircle, Share2, UserPlus, ExternalLink,
+  BookOpen, Brain, Trophy, ChevronDown,
+  Award, Repeat, Compass, MessageSquare, Bot,
+  Edit3, FileText, Type, Shield,
 } from 'lucide-react';
 
 // ============================================================================
@@ -71,11 +72,9 @@ function AppInner() {
   const [user, setUser] = useState(null);
   const [inviteStats, setInviteStats] = useState(null);
   const [usageStats, setUsageStats] = useState(null);
-  const [pricing, setPricing] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [currentPage, setCurrentPage] = useState('home');
   const [loading, setLoading] = useState(true);
-  const [showBuy, setShowBuy] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
 
@@ -85,7 +84,6 @@ function AppInner() {
       setUser(data.user);
       setInviteStats(data.inviteStats);
       setUsageStats(data.usageStats);
-      setPricing(data.pricing || []);
       setPurchases(data.purchases || []);
     } catch (e) {
       console.error('Refresh failed:', e);
@@ -98,9 +96,8 @@ function AppInner() {
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get('token');
     if (urlToken) localStorage.setItem('token', urlToken);
-    if (params.get('buy') === 'true') setShowBuy(true);
     if (params.get('purchased')) setPurchaseSuccess(true);
-    if (urlToken || params.get('buy') || params.get('purchased') || params.get('cancelled')) {
+    if (urlToken || params.get('purchased') || params.get('cancelled')) {
       window.history.replaceState({}, '', '/');
     }
     const token = localStorage.getItem('token');
@@ -126,9 +123,8 @@ function AppInner() {
   if (loading) return <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center text-white">Loading...</div>;
 
   const navItems = [
-    { label: 'Translator', href: '#translator' },
-    { label: 'Tutor', href: '#tutor' },
-    { label: 'Pricing', href: '#pricing' },
+    { label: 'Translate', href: '#translate' },
+    { label: 'Learn', href: '#learn' },
     { label: 'FAQ', href: '#faq' },
   ];
 
@@ -184,10 +180,7 @@ function AppInner() {
           user={user}
           inviteStats={inviteStats}
           usageStats={usageStats}
-          pricing={pricing}
           purchases={purchases}
-          showBuy={showBuy}
-          setShowBuy={setShowBuy}
           purchaseSuccess={purchaseSuccess}
           setPurchaseSuccess={setPurchaseSuccess}
           onNavigate={navigate}
@@ -226,25 +219,25 @@ function Reveal({ children, className = '', delay = 0 }) {
 }
 
 // ============================================================================
-// CHAT DEMO ANIMATION
+// GROUP CHAT DEMO — near real-time translation
 // ============================================================================
 
-function ChatDemo() {
+function GroupChatDemo() {
   const conversations = [
-    { title: 'Vietnam Trip Planning 🌏', messages: [
-      { from: 'Minh', text: 'Các bạn nên đi thăm Hội An, rất đẹp!', translation: '🇺🇸 You guys should visit Hoi An, very beautiful!', side: 'left' },
-      { from: 'Sarah', text: "That sounds amazing! How do we get there from Hanoi?", translation: '🇻🇳 Nghe tuyệt vời quá! Làm sao để đi từ Hà Nội đến đó?', side: 'right' },
-      { from: 'Minh', text: 'Bay khoảng 1 tiếng từ Hà Nội đến Đà Nẵng, rồi đi taxi 30 phút', translation: '🇺🇸 Fly about 1 hour from Hanoi to Da Nang, then 30 min taxi', side: 'left' },
+    { title: 'Vietnam Trip Planning 🌏', subtitle: '3 members · translating live', messages: [
+      { from: 'Minh', text: 'Các bạn nên đi thăm Hội An, rất đẹp!', translation: '🇺🇸 You guys should visit Hoi An, very beautiful!', side: 'left', flag: '🇻🇳' },
+      { from: 'Sarah', text: "That sounds amazing! How do we get there from Hanoi?", translation: '🇻🇳 Nghe tuyệt vời quá! Làm sao để đi từ Hà Nội đến đó?', side: 'right', flag: '🇺🇸' },
+      { from: 'Minh', text: 'Bay khoảng 1 tiếng từ Hà Nội đến Đà Nẵng, rồi đi taxi 30 phút', translation: '🇺🇸 Fly about 1 hour from Hanoi to Da Nang, then 30 min taxi', side: 'left', flag: '🇻🇳' },
     ]},
-    { title: 'Team Standup 💼', messages: [
-      { from: 'Yuki', text: '今日のタスクを共有します', translation: '🇺🇸 I will share today\'s tasks', side: 'left' },
-      { from: 'Carlos', text: 'Necesito ayuda con el diseño', translation: '🇺🇸 I need help with the design', side: 'right' },
-      { from: 'Yuki', text: 'デザインを手伝えますよ！', translation: '🇺🇸 I can help with the design!', side: 'left' },
+    { title: 'Team Standup 💼', subtitle: '5 members · translating live', messages: [
+      { from: 'Yuki', text: '今日のタスクを共有します', translation: '🇺🇸 I will share today\'s tasks', side: 'left', flag: '🇯🇵' },
+      { from: 'Carlos', text: 'Necesito ayuda con el diseño', translation: '🇺🇸 I need help with the design', side: 'right', flag: '🇪🇸' },
+      { from: 'Yuki', text: 'デザインを手伝えますよ！', translation: '🇺🇸 I can help with the design!', side: 'left', flag: '🇯🇵' },
     ]},
-    { title: 'Language Exchange 🗣️', messages: [
-      { from: 'Pierre', text: "J'apprends le coréen, c'est difficile!", translation: '🇺🇸 I\'m learning Korean, it\'s difficult!', side: 'left' },
-      { from: 'Soo-jin', text: '프랑스어도 어려워요! 같이 연습해요', translation: '🇺🇸 French is difficult too! Let\'s practice together', side: 'right' },
-      { from: 'Pierre', text: "Bonne idée! On commence quand?", translation: '🇺🇸 Good idea! When do we start?', side: 'left' },
+    { title: 'Family Group 👨‍👩‍👧', subtitle: '4 members · translating live', messages: [
+      { from: 'Mẹ', text: 'Con ăn cơm chưa?', translation: '🇺🇸 Have you eaten yet?', side: 'left', flag: '🇻🇳' },
+      { from: 'David', text: 'Not yet mom! What did you cook?', translation: '🇻🇳 Chưa mẹ ơi! Mẹ nấu gì?', side: 'right', flag: '🇺🇸' },
+      { from: 'Mẹ', text: 'Phở bò nhé, về sớm đi con 🍜', translation: '🇺🇸 Beef pho, come home early 🍜', side: 'left', flag: '🇻🇳' },
     ]},
   ];
 
@@ -270,20 +263,26 @@ function ChatDemo() {
   return (
     <div className="w-full max-w-lg mx-auto">
       <div className="rounded-2xl overflow-hidden" style={{ ...S.card, border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="px-5 py-4 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-            <MessageCircle className="w-5 h-5 text-white" />
+        <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+              <Users className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-white">{convo.title}</div>
+              <div className="text-xs text-gray-400">{convo.subtitle}</div>
+            </div>
           </div>
-          <div>
-            <div className="text-sm font-semibold text-white">{convo.title}</div>
-            <div className="text-xs text-gray-400">LinguaXYZ translating...</div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-[10px] text-green-400 font-medium">LIVE</span>
           </div>
         </div>
         <div className="p-4 space-y-4 min-h-[280px]">
           {convo.messages.map((msg, i) => visibleMessages.includes(i) && (
             <div key={`${activeConvo}-${i}`} className={`flex flex-col ${msg.side === 'right' ? 'items-end' : 'items-start'}`}
               style={{ animation: 'fadeIn 0.4s ease-out' }}>
-              <span className="text-xs text-gray-500 mb-1 px-1">{msg.from}</span>
+              <span className="text-xs text-gray-500 mb-1 px-1">{msg.flag} {msg.from}</span>
               <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${msg.side === 'right' ? 'bg-purple-500/30 text-purple-100' : 'bg-white/10 text-gray-200'}`}>
                 {msg.text}
               </div>
@@ -300,7 +299,7 @@ function ChatDemo() {
       <div className="flex flex-wrap justify-center gap-4 mt-6 px-4">
         {conversations.map((c, i) => (
           <button key={i} onClick={() => setActiveConvo(i)}
-            className={`text-xs px-3 py-1.5 rounded-full transition-all ${i === activeConvo ? 'bg-purple-500/30 text-purple-300 border border-purple-500/40' : 'bg-white/5 text-gray-500 border border-transparent hover:text-gray-300'}`}>
+            className={`text-xs px-3 py-1.5 rounded-full transition-all ${i === activeConvo ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/40' : 'bg-white/5 text-gray-500 border border-transparent hover:text-gray-300'}`}>
             {c.title}
           </button>
         ))}
@@ -361,16 +360,15 @@ const CURRICULUM = [
 ];
 
 const FAQS = [
-  { q: 'How does the translator work in group chats?', a: 'Add @linguaxyz_bot to any group. Each member sets their language pairs with /setlang. The bot silently translates every message — no commands needed. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English.' },
-  { q: 'What languages are supported?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, and more. The tutor currently teaches English, Spanish, French, Japanese, Chinese (Mandarin), and Korean.' },
-  { q: 'Will I actually become conversational?', a: 'Each of the 30 units has 4 phases (lesson, practice, conversation, quiz) — that\'s 120+ structured sessions plus free talk and roleplay. At 30 min/day, expect 3–6 months to reach CEFR B1 depending on the language.' },
-  { q: 'How much does it cost?', a: 'You get 10k tokens free on signup. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. Plans start at $5 for 50k tokens (~25 translation messages or ~10 tutor sessions).' },
-  { q: 'Can I use it for just translation or just learning?', a: 'Absolutely. Many people use only the translator in group chats. Others only use the tutor in DMs. They\'re independent features that share your token balance.' },
-  { q: 'How does spaced repetition work?', a: 'Every word you learn gets tracked with the SM-2 algorithm. Words you struggle with come back more often. Use /review to practice due words — the bot schedules them automatically.' },
+  { q: 'How does translation work in group chats?', a: 'Add @linguaxyz_bot to any group. Each member sets their language pairs with /setlang. The bot translates every message near real-time — no commands needed. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English. Everyone speaks their language, everyone understands each other.' },
+  { q: 'What languages can I translate?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Russian, Arabic, Hindi, and more. Any pair works.' },
+  { q: 'What languages can I learn?', a: 'The tutor teaches 6 languages: English, Spanish, French, Japanese, Chinese (Mandarin), and Korean. More coming soon.' },
+  { q: 'How much does it cost?', a: 'You get 50k tokens free on signup. Invite a friend and you both get 10k more — unlimited invites. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. No subscriptions, no credit card needed.' },
+  { q: 'What types of lessons are available?', a: 'Structured curriculum classes, free conversation practice, 22 roleplay scenarios, vocabulary quizzes, spaced repetition review, writing practice with corrections, and reading comprehension with questions. All adapt to your level.' },
+  { q: 'How does spaced repetition work?', a: 'Every word you learn gets tracked with the SM-2 algorithm. Words you struggle with come back more often. Use /review to practice due words — the bot schedules them automatically based on how well you remember.' },
   { q: 'What\'s the difference between Free Talk and Roleplay?', a: 'Free Talk is open conversation — chat about anything with gentle corrections. Roleplay puts you in a scenario (ordering at a café, job interview, seeing a doctor) with a goal to complete.' },
-  { q: 'How do gate quizzes work?', a: 'At units 10, 20, and 30, you face a gate quiz covering everything in that tier. You need 70% to advance. If you fail, review the units and try again — no penalty.' },
-  { q: 'What happens when I run out of tokens?', a: 'The bot stops translating and tutoring. Buy more with /buy, invite friends for 10k bonus each, or wait — there\'s no subscription, just pay-as-you-go.' },
-  { q: 'Does the bot work in DMs too?', a: 'Yes! DM the bot for tutoring (classes, free talk, roleplay, quizzes). Translation works both in groups and DMs — send any text and it translates based on your /setlang pairs.' },
+  { q: 'Can I use it for just translation or just learning?', a: 'Absolutely. Many people use only the translator in group chats. Others only use the tutor in DMs. They\'re independent features that share your token balance.' },
+  { q: 'Does the bot work in DMs too?', a: 'Yes! DM the bot for tutoring and translation. Translation works both in groups and DMs — send any text and it translates based on your /setlang pairs.' },
 ];
 
 function HomePage() {
@@ -381,21 +379,20 @@ function HomePage() {
         <div className="absolute inset-0 opacity-30" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.15) 0%, transparent 60%)' }} />
         <div className="max-w-4xl mx-auto relative">
           <Reveal>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-sm mb-8">
-              <Sparkles className="w-4 h-4" /> One bot. Two superpowers.
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-300 text-sm mb-8">
+              <Sparkles className="w-4 h-4" /> Free to start — 50k tokens, no credit card
             </div>
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Translate instantly.<br />
-              <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">Learn for real.</span>
+              Translate your group chats.<br />
+              <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">Learn any language.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-              LinguaXYZ is a Telegram bot that translates your group chats in 20 languages
-              <em> and </em> teaches you a new language with a 30-unit AI curriculum.
-              <span className="text-white"> 10k free tokens</span> to start.
+              A Telegram bot that translates group conversations in 20 languages near real-time,
+              and teaches you a new language with classes, conversation practice, writing, and reading.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -407,67 +404,42 @@ function HomePage() {
           <Reveal delay={0.4}>
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-14 text-sm text-gray-500">
               <span className="font-semibold text-white text-2xl">20 <span className="text-sm font-normal text-gray-400">languages</span></span>
-              <span className="font-semibold text-white text-2xl">120 <span className="text-sm font-normal text-gray-400">lesson sessions</span></span>
-              <span className="font-semibold text-white text-2xl">22 <span className="text-sm font-normal text-gray-400">roleplay scenarios</span></span>
-              <span className="font-semibold text-white text-2xl">0→B1 <span className="text-sm font-normal text-gray-400">curriculum</span></span>
+              <span className="font-semibold text-white text-2xl">8 <span className="text-sm font-normal text-gray-400">practice modes</span></span>
+              <span className="font-semibold text-white text-2xl">36 <span className="text-sm font-normal text-gray-400">curriculum topics</span></span>
+              <span className="font-semibold text-white text-2xl">0→B1 <span className="text-sm font-normal text-gray-400">path</span></span>
             </div>
           </Reveal>
         </div>
       </div>
 
-      {/* Two Features */}
-      <div className="py-16 px-6">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
-          <Reveal>
-            <div style={S.card} className="rounded-2xl p-8 h-full">
-              <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-5 text-cyan-400">
-                <Globe className="w-6 h-6" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3">Translator</h3>
-              <p className="text-gray-400 text-sm mb-5">Auto-translates every message in group chats. Each person speaks their language — everyone understands everyone.</p>
-              <div className="space-y-2 text-sm">
-                {['Auto-detection — just talk', '20 languages, any pair', 'Works in groups and DMs', 'Zero setup after /setlang'].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 text-gray-300"><Check className="w-4 h-4 text-cyan-400 shrink-0" />{f}</div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-          <Reveal delay={0.15}>
-            <div style={S.card} className="rounded-2xl p-8 h-full">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-5 text-purple-400">
-                <GraduationCap className="w-6 h-6" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3">Tutor</h3>
-              <p className="text-gray-400 text-sm mb-5">A 30-unit curriculum with 4 phases per unit — lesson, practice, conversation, quiz. Takes you from "hello" to real conversations.</p>
-              <div className="space-y-2 text-sm">
-                {['4 phases per unit: learn → drill → talk → prove it', 'Free Talk, Roleplay, Spaced Repetition', 'AI remembers your mistakes', 'Streaks, XP, badges, leaderboard'].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 text-gray-300"><Check className="w-4 h-4 text-purple-400 shrink-0" />{f}</div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </div>
-
-      {/* Translator Deep Dive */}
-      <div id="translator" className="py-20 px-6">
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 1: TRANSLATE
+         ═══════════════════════════════════════════════════════════════════════ */}
+      <div id="translate" className="py-20 px-6" style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(6,182,212,0.03) 50%, transparent 100%)' }}>
         <div className="max-w-5xl mx-auto">
           <Reveal>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Translation that just works</h2>
-              <p className="text-gray-400 max-w-xl mx-auto">Add the bot to any group. Everyone speaks their language. AI translates every message automatically.</p>
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold uppercase tracking-wider mb-4">
+                <Globe className="w-3.5 h-3.5" /> Translation
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Group chat translation, near real-time</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">Add the bot to any Telegram group. Everyone speaks their language — the bot translates every message automatically. No commands, no delays. Just talk.</p>
             </div>
           </Reveal>
+
+          {/* Live group chat demo */}
           <Reveal delay={0.1}>
-            <ChatDemo />
+            <GroupChatDemo />
           </Reveal>
+
+          {/* Translation features */}
           <Reveal delay={0.2}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14">
               {[
-                { icon: <Zap className="w-5 h-5" />, title: 'Auto-detection', desc: 'Detects language automatically', color: 'purple' },
-                { icon: <Users className="w-5 h-5" />, title: 'Multi-pair', desc: 'Each user gets their own pairs', color: 'cyan' },
-                { icon: <Brain className="w-5 h-5" />, title: 'AI-powered', desc: 'Claude handles nuance & slang', color: 'amber' },
-                { icon: <Sparkles className="w-5 h-5" />, title: 'Zero setup', desc: 'One /setlang command, done', color: 'green' },
+                { icon: <Users className="w-5 h-5" />, title: 'Group chats', desc: 'Everyone speaks their language, everyone understands', color: 'cyan' },
+                { icon: <Zap className="w-5 h-5" />, title: 'Near real-time', desc: 'Translations appear within seconds', color: 'amber' },
+                { icon: <Type className="w-5 h-5" />, title: '20 languages', desc: 'Any pair — Vietnamese, English, Japanese, and more', color: 'purple' },
+                { icon: <Shield className="w-5 h-5" />, title: 'Just /setlang', desc: 'One command to set up, then fully automatic', color: 'green' },
               ].map((f, i) => (
                 <div key={i} style={S.card} className="rounded-xl p-5 text-center">
                   <div className={`w-10 h-10 rounded-lg bg-${f.color}-500/20 flex items-center justify-center mx-auto mb-3 text-${f.color}-400`}>{f.icon}</div>
@@ -477,7 +449,29 @@ function HomePage() {
               ))}
             </div>
           </Reveal>
+
+          {/* How group translation works */}
           <Reveal delay={0.3}>
+            <div style={S.card} className="rounded-2xl p-6 md:p-8 mt-10">
+              <h3 className="font-bold text-lg mb-5 text-center">How group translation works</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { step: '1', title: 'Add bot to group', desc: 'Add @linguaxyz_bot to any Telegram group chat.' },
+                  { step: '2', title: 'Each person runs /setlang', desc: 'Pick your language pair — Vietnamese↔English, Japanese↔English, etc.' },
+                  { step: '3', title: 'Just chat normally', desc: 'The bot translates every message automatically. No /translate commands needed.' },
+                ].map((s, i) => (
+                  <div key={i} className="text-center">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-sm font-bold mx-auto mb-3">{s.step}</div>
+                    <div className="font-semibold text-sm mb-1">{s.title}</div>
+                    <div className="text-xs text-gray-400">{s.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Supported languages */}
+          <Reveal delay={0.4}>
             <div className="flex flex-wrap justify-center gap-2 mt-10">
               {LANGUAGES.map(lang => (
                 <span key={lang} className="text-xs px-3 py-1.5 rounded-full bg-white/5 text-gray-400 border border-white/5">{lang}</span>
@@ -487,19 +481,86 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Tutor — Curriculum Timeline */}
-      <div id="tutor" className="py-20 px-6" style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.03) 50%, transparent 100%)' }}>
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 2: LEARN
+         ═══════════════════════════════════════════════════════════════════════ */}
+      <div id="learn" className="py-20 px-6" style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.03) 50%, transparent 100%)' }}>
         <div className="max-w-5xl mx-auto">
           <Reveal>
             <div className="text-center mb-6">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">30 units from "hello" to <em>holding a conversation</em></h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Each unit has 4 phases. You don't move on until you prove you've learned it.</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-4">
+                <Award className="w-3.5 h-3.5" /> Language School
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">A full language school in your pocket</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, conversation practice, writing, reading, quizzes, roleplay — 8 ways to practice, all powered by AI that remembers your strengths and weaknesses.</p>
             </div>
           </Reveal>
 
-          {/* Phase indicators */}
+          {/* 8 Practice Modes — emphasize new ones */}
+          <div className="grid md:grid-cols-4 gap-4 mb-14">
+            {[
+              { icon: <BookOpen className="w-5 h-5" />, title: 'Structured Classes', desc: '36-topic curriculum from greetings to debate', color: 'purple', tag: null },
+              { icon: <MessageSquare className="w-5 h-5" />, title: 'Free Conversation', desc: 'Chat about anything with real-time corrections', color: 'cyan', tag: null },
+              { icon: <Compass className="w-5 h-5" />, title: 'Roleplay', desc: '22 real-life scenarios — café, airport, interview', color: 'amber', tag: null },
+              { icon: <Brain className="w-5 h-5" />, title: 'Vocabulary Quiz', desc: 'Multiple choice, fill-in-the-blank, context clues', color: 'pink', tag: null },
+              { icon: <Edit3 className="w-5 h-5" />, title: 'Writing Practice', desc: 'Write responses to prompts, get detailed corrections & vocabulary upgrades', color: 'emerald', tag: 'NEW' },
+              { icon: <FileText className="w-5 h-5" />, title: 'Reading Comprehension', desc: 'Read passages, answer questions, learn useful phrases', color: 'blue', tag: 'NEW' },
+              { icon: <Repeat className="w-5 h-5" />, title: 'Spaced Repetition', desc: 'SM-2 algorithm schedules reviews at the right time', color: 'orange', tag: null },
+              { icon: <Trophy className="w-5 h-5" />, title: 'Streaks & XP', desc: 'Daily streaks, levels, badges, and leaderboard', color: 'yellow', tag: null },
+            ].map((m, i) => (
+              <Reveal key={i} delay={i * 0.06}>
+                <div style={S.card} className="rounded-2xl p-5 h-full relative">
+                  {m.tag && (
+                    <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                      {m.tag}
+                    </div>
+                  )}
+                  <div className={`w-10 h-10 rounded-xl bg-${m.color}-500/20 flex items-center justify-center mb-3 text-${m.color}-400`}>{m.icon}</div>
+                  <h3 className="font-semibold text-sm mb-1">{m.title}</h3>
+                  <p className="text-xs text-gray-400 leading-relaxed">{m.desc}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* NEW: Writing & Reading deep dive */}
+          <Reveal>
+            <div className="grid md:grid-cols-2 gap-5 mb-14">
+              <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 100%)', border: '1px solid rgba(16,185,129,0.15)' }}>
+                <div className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">New</div>
+                <Edit3 className="w-8 h-8 text-emerald-400 mb-4" />
+                <h3 className="text-xl font-bold mb-3">✍️ Writing Practice</h3>
+                <p className="text-sm text-gray-400 mb-4">Get a prompt matched to your level. Write your response. The tutor provides detailed corrections with explanations, grammar notes, and vocabulary upgrades.</p>
+                <div className="space-y-2 text-sm">
+                  {['Beginners: 2-3 sentences · Advanced: full paragraphs', 'Detailed corrections with explanations', 'Vocabulary upgrades suggested', '3-4 exchanges per session, earns XP'].map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-gray-300"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /><span className="text-xs">{f}</span></div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(59,130,246,0.02) 100%)', border: '1px solid rgba(59,130,246,0.15)' }}>
+                <div className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-wider">New</div>
+                <FileText className="w-8 h-8 text-blue-400 mb-4" />
+                <h3 className="text-xl font-bold mb-3">📄 Reading Comprehension</h3>
+                <p className="text-sm text-gray-400 mb-4">Read short passages — menus, news snippets, or articles depending on your level. Answer comprehension questions and learn useful phrases from the text.</p>
+                <div className="space-y-2 text-sm">
+                  {['Level-matched passages (menu → news → articles)', 'Multiple choice comprehension questions', 'Explains mistakes, highlights useful phrases', '2-3 passages per session, earns XP'].map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-gray-300"><Check className="w-3.5 h-3.5 text-blue-400 shrink-0" /><span className="text-xs">{f}</span></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Curriculum Timeline */}
+          <Reveal>
+            <div className="text-center mb-6">
+              <h3 className="text-2xl md:text-3xl font-bold mb-3">36 topics from "hello" to <em>holding a conversation</em></h3>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">Each unit has 4 phases: lesson → practice → conversation → quiz. You don't move on until you prove you've learned it.</p>
+            </div>
+          </Reveal>
+
           <Reveal delay={0.1}>
-            <div className="flex flex-wrap justify-center gap-3 mb-14">
+            <div className="flex flex-wrap justify-center gap-3 mb-10">
               {[
                 { emoji: '📖', name: 'Lesson', desc: 'learn concepts', color: 'cyan' },
                 { emoji: '💪', name: 'Practice', desc: 'drills & exercises', color: 'amber' },
@@ -515,8 +576,7 @@ function HomePage() {
             </div>
           </Reveal>
 
-          {/* Tiers */}
-          <div className="space-y-10">
+          <div className="space-y-6">
             {CURRICULUM.map((tier, ti) => (
               <Reveal key={ti} delay={ti * 0.1}>
                 <div style={S.card} className="rounded-2xl p-6 md:p-8">
@@ -558,34 +618,6 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Practice Modes */}
-      <div className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <Reveal>
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Six ways to practice</h2>
-          </Reveal>
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              { icon: <MessageSquare className="w-6 h-6" />, title: 'Free Talk', desc: 'Open conversation with gentle corrections. Chat about anything.', color: 'cyan', cmd: '/talk' },
-              { icon: <Gamepad2 className="w-6 h-6" />, title: 'Roleplay', desc: '22 real-life scenarios — café, doctor, job interview, airport...', color: 'purple', cmd: '/roleplay' },
-              { icon: <BookOpen className="w-6 h-6" />, title: '?word Lookup', desc: 'Type ?word during any session to instantly look up a word.', color: 'amber', cmd: '?hola' },
-              { icon: <Repeat className="w-6 h-6" />, title: 'Spaced Repetition', desc: 'SM-2 algorithm schedules reviews. Words you struggle with come back more.', color: 'green', cmd: '/review' },
-              { icon: <Brain className="w-6 h-6" />, title: 'AI Memory', desc: 'The bot remembers your weak spots and personalizes every lesson.', color: 'pink', cmd: 'automatic' },
-              { icon: <Trophy className="w-6 h-6" />, title: 'Streaks & XP', desc: 'Daily streaks, XP for everything, badges, and a global leaderboard.', color: 'orange', cmd: '/progress' },
-            ].map((m, i) => (
-              <Reveal key={i} delay={i * 0.08}>
-                <div style={S.card} className="rounded-2xl p-6 h-full">
-                  <div className={`w-11 h-11 rounded-xl bg-${m.color}-500/20 flex items-center justify-center mb-4 text-${m.color}-400`}>{m.icon}</div>
-                  <h3 className="font-semibold mb-2">{m.title}</h3>
-                  <p className="text-sm text-gray-400 mb-3">{m.desc}</p>
-                  <code className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded">{m.cmd}</code>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* How It Works */}
       <div className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
@@ -594,9 +626,9 @@ function HomePage() {
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: <Bot className="w-6 h-6" />, title: 'Open Telegram', desc: 'Tap "Start on Telegram" — you get 10k tokens and an account instantly.' },
-              { icon: <MessageCircle className="w-6 h-6" />, title: 'Pick your mode', desc: 'Add to a group for translation. DM the bot for language lessons.' },
-              { icon: <Zap className="w-6 h-6" />, title: 'Go', desc: 'Translate or learn. No signup forms, no subscriptions, no setup.' },
+              { icon: <Bot className="w-6 h-6" />, title: 'Open Telegram', desc: 'Tap "Start on Telegram" — you get 50k tokens instantly. No signup, no email.' },
+              { icon: <MessageCircle className="w-6 h-6" />, title: 'Pick your path', desc: 'Choose Translate to start translating, Learn to pick a language and take your first lesson, or My Account to manage tokens.' },
+              { icon: <Zap className="w-6 h-6" />, title: 'Go', desc: 'Add bot to groups for translation, or DM for lessons. Invite friends for more free tokens.' },
             ].map((s, i) => (
               <Reveal key={i} delay={i * 0.1}>
                 <div style={S.card} className="rounded-2xl p-6 text-center relative">
@@ -611,41 +643,35 @@ function HomePage() {
         </div>
       </div>
 
-      {/* FAQ + Commands */}
+      {/* FAQ & Commands */}
       <div id="faq" className="py-20 px-6" style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.01) 50%, transparent 100%)' }}>
         <div className="max-w-5xl mx-auto">
           <Reveal>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">FAQ & Commands</h2>
           </Reveal>
           <div className="grid md:grid-cols-2 gap-10">
-            {/* Commands */}
+            {/* Commands — updated to match new structure */}
             <Reveal>
               <div>
                 <h3 className="font-bold text-lg mb-5 text-gray-300">Commands</h3>
                 {[
-                  { title: 'Translation', cmds: [
-                    ['/setlang', 'Set translation pairs'],
-                    ['/languages', 'View current pairs'],
-                    ['/status', 'Bot status & uptime'],
+                  { title: 'Main', cmds: [
+                    ['/start', 'Main menu (Translate · Learn · Account)'],
+                    ['/translate', 'Translation menu'],
+                    ['/learn', 'Language school'],
+                    ['/help', 'Show all commands'],
                   ]},
-                  { title: 'Tutor', cmds: [
-                    ['/learn', 'Open tutor dashboard'],
-                    ['/path', 'View curriculum progress'],
-                    ['/class', 'Start structured class'],
-                    ['/talk', 'Start Free Talk'],
-                    ['/roleplay', 'Pick roleplay scenario'],
-                    ['/quiz', 'Quick vocabulary quiz'],
-                    ['/review', 'Spaced repetition review'],
-                    ['/progress', 'Detailed stats'],
+                  { title: 'Translation', cmds: [
+                    ['/setlang', 'Set translation language pairs'],
+                  ]},
+                  { title: 'Learning', cmds: [
+                    ['/talk', 'Free conversation practice'],
                     ['/stop', 'End current session'],
-                    ['/schedule', 'Set weekly class schedule'],
-                    ['?word', 'Inline word lookup'],
+                    ['?word', 'Look up any word mid-lesson'],
                   ]},
                   { title: 'Account', cmds: [
+                    ['/invite', 'Get referral link (earn 10k tokens)'],
                     ['/balance', 'Check token balance'],
-                    ['/buy', 'Purchase tokens'],
-                    ['/invite', 'Get referral link'],
-                    ['/web', 'Open web dashboard'],
                   ]},
                 ].map((group, gi) => (
                   <div key={gi} className="mb-5">
@@ -658,6 +684,9 @@ function HomePage() {
                     ))}
                   </div>
                 ))}
+                <div className="mt-4 p-3 rounded-lg bg-white/5 text-xs text-gray-500">
+                  Power users: <code className="text-gray-400">/class</code> <code className="text-gray-400">/quiz</code> <code className="text-gray-400">/roleplay</code> <code className="text-gray-400">/review</code> <code className="text-gray-400">/progress</code> <code className="text-gray-400">/path</code> <code className="text-gray-400">/schedule</code> also work as shortcuts.
+                </div>
               </div>
             </Reveal>
 
@@ -672,36 +701,29 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Pricing */}
-      <div id="pricing" className="py-20 px-6">
+      {/* Free Tokens */}
+      <div className="py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <Reveal>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple pay-as-you-go pricing</h2>
-            <p className="text-gray-400 mb-12">No subscriptions. Buy tokens when you need them.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">100% free to start</h2>
+            <p className="text-gray-400 mb-10 max-w-xl mx-auto">No credit card. No subscription. Get 50k tokens on signup and earn more by inviting friends.</p>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { name: 'Starter', price: '$5', tokens: '50K', desc: '~250 translations or ~10 tutor sessions' },
-              { name: 'Regular', price: '$15', tokens: '200K', desc: '~1,000 translations or ~40 tutor sessions', popular: true },
-              { name: 'Power', price: '$35', tokens: '500K', desc: '~2,500 translations or ~100 tutor sessions' },
-            ].map((tier, i) => (
+              { icon: <Sparkles className="w-6 h-6" />, title: 'Sign up', tokens: '50k', desc: 'Free tokens just for starting', color: 'green' },
+              { icon: <UserPlus className="w-6 h-6" />, title: 'Invite a friend', tokens: '+10k each', desc: 'You both get 10k — unlimited invites', color: 'cyan' },
+              { icon: <Gift className="w-6 h-6" />, title: 'Keep inviting', tokens: '∞', desc: 'No cap on referral tokens', color: 'purple' },
+            ].map((t, i) => (
               <Reveal key={i} delay={i * 0.1}>
-                <div className={`rounded-2xl p-6 relative ${tier.popular ? 'ring-2 ring-purple-500/50' : ''}`} style={S.card}>
-                  {tier.popular && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-purple-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Popular</div>}
-                  <div className="text-3xl font-bold mb-1">{tier.price}</div>
-                  <div className="text-lg font-semibold text-purple-400 mb-1">{tier.tokens} tokens</div>
-                  <div className="text-xs text-gray-500 mb-5">{tier.desc}</div>
-                  <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
-                    style={tier.popular ? S.btnP : S.btnS} className="block w-full py-3 rounded-xl text-sm font-medium text-white text-center no-underline">
-                    Buy via /buy
-                  </a>
+                <div style={S.card} className="rounded-2xl p-6 text-center">
+                  <div className={`w-12 h-12 rounded-xl bg-${t.color}-500/20 flex items-center justify-center mx-auto mb-4 text-${t.color}-400`}>{t.icon}</div>
+                  <div className="text-2xl font-bold mb-1">{t.tokens}</div>
+                  <div className="font-semibold text-sm mb-1">{t.title}</div>
+                  <div className="text-xs text-gray-500">{t.desc}</div>
                 </div>
               </Reveal>
             ))}
           </div>
-          <Reveal delay={0.3}>
-            <p className="text-sm text-gray-500 mt-8">Everyone gets <span className="text-white font-medium">10k free tokens</span> on signup. Invite friends for 10k more each.</p>
-          </Reveal>
         </div>
       </div>
 
@@ -709,7 +731,7 @@ function HomePage() {
       <div className="py-20 px-6 text-center">
         <Reveal>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Start translating. Start learning.</h2>
-          <p className="text-gray-400 mb-8 max-w-lg mx-auto">One Telegram bot for both. No signup, no setup, 10k tokens free.</p>
+          <p className="text-gray-400 mb-8 max-w-lg mx-auto">One Telegram bot for both. No signup, no credit card, 50k tokens free.</p>
           <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
             style={S.btnP} className="px-8 py-4 rounded-xl text-white font-semibold text-lg inline-flex items-center gap-2 no-underline">
             Start on Telegram <ArrowRight className="w-5 h-5" />
@@ -728,12 +750,11 @@ function HomePage() {
 }
 
 // ============================================================================
-// DASHBOARD
+// DASHBOARD — updated: no buy tokens, referral-only
 // ============================================================================
 
-function Dashboard({ user, inviteStats, usageStats, pricing, purchases, showBuy, setShowBuy, purchaseSuccess, setPurchaseSuccess, onNavigate, onRefresh }) {
+function Dashboard({ user, inviteStats, usageStats, purchases, purchaseSuccess, setPurchaseSuccess, onNavigate, onRefresh }) {
   const [copied, setCopied] = useState(null);
-  const [buyLoading, setBuyLoading] = useState(null);
 
   if (!user) { onNavigate('home'); return null; }
 
@@ -742,23 +763,6 @@ function Dashboard({ user, inviteStats, usageStats, pricing, purchases, showBuy,
   const totalMessages = usageStats?.totalMessages || 0;
   const botInviteUrl = `https://t.me/linguaxyz_bot?start=ref_${user.inviteCode}`;
 
-  const handleBuy = async (tierId) => {
-    setBuyLoading(tierId);
-    try {
-      const data = await apiFetch('/api/create-checkout', {
-        method: 'POST',
-        body: JSON.stringify({ tierId }),
-      });
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (e) {
-      alert(e.message || 'Failed to create checkout');
-    } finally {
-      setBuyLoading(null);
-    }
-  };
-
   return (
     <div className="min-h-screen pt-24 pb-12 px-6">
       <div className="max-w-4xl mx-auto">
@@ -766,7 +770,7 @@ function Dashboard({ user, inviteStats, usageStats, pricing, purchases, showBuy,
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-1">Hi, {user.name}! 👋</h1>
-            <p className="text-gray-400">Your translation dashboard</p>
+            <p className="text-gray-400">Your LinguaXYZ dashboard</p>
           </div>
           <button onClick={onRefresh} style={S.btnS} className="px-4 py-2.5 rounded-xl font-medium flex items-center gap-2 text-sm text-white">
             <RefreshCw className="w-4 h-4" /> Refresh
@@ -777,7 +781,7 @@ function Dashboard({ user, inviteStats, usageStats, pricing, purchases, showBuy,
         {purchaseSuccess && (
           <div className="mb-6 px-5 py-4 rounded-xl flex items-center gap-3" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)' }}>
             <Check className="w-5 h-5 text-green-400" />
-            <span className="text-sm text-green-300 font-medium">Payment successful! Your tokens have been added.</span>
+            <span className="text-sm text-green-300 font-medium">Tokens added successfully!</span>
             <button onClick={() => { setPurchaseSuccess(false); onRefresh(); }} className="ml-auto text-green-400 text-xs hover:underline">Dismiss</button>
           </div>
         )}
@@ -812,65 +816,17 @@ function Dashboard({ user, inviteStats, usageStats, pricing, purchases, showBuy,
             <AlertCircle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
             <div className="flex-1">
               <span className="text-sm text-orange-300 font-medium">Low balance!</span>
-              <span className="text-sm text-orange-300/70 ml-1">You have {formatTokens(user.balance)} tokens left.</span>
+              <span className="text-sm text-orange-300/70 ml-1">You have {formatTokens(user.balance)} tokens left. Invite friends to earn more!</span>
             </div>
-            <button onClick={() => setShowBuy(true)} style={S.btnP} className="px-4 py-2 rounded-lg text-white text-xs font-medium shrink-0">
-              Buy Tokens
-            </button>
           </div>
         )}
-
-        {/* Buy Tokens */}
-        <div style={S.card} className="rounded-2xl p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-green-400" /> Buy Tokens
-            </h2>
-            {!showBuy && (
-              <button onClick={() => setShowBuy(true)} className="text-sm text-purple-400 hover:text-purple-300">View pricing →</button>
-            )}
-          </div>
-          {showBuy ? (
-            <div className="grid md:grid-cols-3 gap-4">
-              {pricing.map((tier, i) => (
-                <div key={tier.id} className={`rounded-xl p-5 text-center relative ${i === 1 ? 'ring-2 ring-purple-500/50' : ''}`}
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  {i === 1 && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-purple-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Popular</div>}
-                  <div className="text-2xl font-bold mb-1">{tier.priceLabel}</div>
-                  <div className="text-sm text-gray-400 mb-4">{tier.label}</div>
-                  <button
-                    onClick={() => handleBuy(tier.id)}
-                    disabled={buyLoading === tier.id}
-                    style={i === 1 ? S.btnP : S.btnS}
-                    className="w-full py-3 rounded-xl text-sm font-medium text-white"
-                  >
-                    {buyLoading === tier.id ? <RefreshCw className="w-4 h-4 animate-spin mx-auto" /> : 'Buy Now'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-400 text-sm">Need more tokens? Purchase securely with Stripe.</p>
-          )}
-          {purchases.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-white/5">
-              <div className="text-xs text-gray-500 mb-2">Recent purchases</div>
-              {purchases.slice(0, 3).map((p, i) => (
-                <div key={i} className="flex items-center justify-between text-xs text-gray-400 py-1">
-                  <span>${p.amount} — {formatTokens(p.tokens)} tokens</span>
-                  <span>{new Date(p.date).toLocaleDateString()}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
         {/* Invite Friends */}
         <div style={S.card} className="rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <Share2 className="w-5 h-5 text-cyan-400" /> Invite Friends — Earn 10k Tokens
+            <Share2 className="w-5 h-5 text-cyan-400" /> Invite Friends — Earn 10k Tokens Each
           </h2>
-          <p className="text-gray-400 text-sm mb-4">Share your invite link. When a friend clicks it and starts the bot, you both get 10,000 tokens instantly!</p>
+          <p className="text-gray-400 text-sm mb-4">Share your invite link. When a friend clicks it and starts the bot, you both get 10,000 tokens instantly. No limit!</p>
           <div className="flex items-center gap-2">
             <div className="flex-1 px-4 py-3 rounded-xl text-sm font-mono truncate" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
               {botInviteUrl}
@@ -893,13 +849,13 @@ function Dashboard({ user, inviteStats, usageStats, pricing, purchases, showBuy,
         {/* How to get tokens */}
         <div style={S.card} className="rounded-2xl p-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <Gift className="w-5 h-5 text-green-400" /> How to Get Tokens
+            <Gift className="w-5 h-5 text-green-400" /> How to Get More Tokens
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { icon: <Share2 className="w-5 h-5" />, title: 'Invite friends', desc: 'Both of you get 10k tokens free', color: 'cyan' },
-              { icon: <CreditCard className="w-5 h-5" />, title: 'Buy tokens', desc: 'Instant top-up with Stripe', color: 'green' },
-              { icon: <MessageCircle className="w-5 h-5" />, title: 'Use /buy in bot', desc: 'Purchase directly from Telegram', color: 'purple' },
+              { icon: <Share2 className="w-5 h-5" />, title: 'Invite friends', desc: 'Both of you get 10k tokens — no limit!', color: 'cyan' },
+              { icon: <MessageCircle className="w-5 h-5" />, title: 'Share in groups', desc: 'Add bot to groups, friends auto-discover it', color: 'purple' },
+              { icon: <Gift className="w-5 h-5" />, title: 'Share your link', desc: 'Post your invite link on social media', color: 'green' },
             ].map((s, i) => (
               <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
                 <div className={`w-8 h-8 rounded-lg bg-${s.color}-500/20 flex items-center justify-center text-${s.color}-400 shrink-0`}>{s.icon}</div>
