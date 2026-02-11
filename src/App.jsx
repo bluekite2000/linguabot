@@ -309,6 +309,96 @@ function GroupChatDemo() {
 }
 
 // ============================================================================
+// TUTOR CHAT DEMO — showcases learning conversations
+// ============================================================================
+
+function TutorChatDemo() {
+  const scenes = [
+    { title: '🗣️ Free Conversation', subtitle: 'Practicing Spanish', messages: [
+      { from: 'You', text: 'Ayer yo fui al mercado y compré muchas frutas', role: 'student' },
+      { from: 'Tutor', text: '¡Casi perfecto! Small fix: "yo fui" → just "fui" — subject pronouns are usually dropped in Spanish. So: "Ayer fui al mercado." 🎯', role: 'tutor' },
+      { from: 'You', text: 'Ah okay! Fui al mercado y compré manzanas', role: 'student' },
+      { from: 'Tutor', text: '¡Excelente! 🌟 Perfect this time. "Compré manzanas" — great use of past tense. What else did you buy?', role: 'tutor' },
+    ]},
+    { title: '✍️ Writing Practice', subtitle: 'Learning Japanese', messages: [
+      { from: 'Tutor', text: '📝 Write 2-3 sentences about what you did last weekend.', role: 'tutor' },
+      { from: 'You', text: '週末に友達と映画を見ました。とても面白いでした。', role: 'student' },
+      { from: 'Tutor', text: 'Great effort! One fix: "面白いでした" → "面白かったです" — i-adjectives conjugate directly (drop い, add かった). \n\n✨ Upgrade: Try "友達と一緒に" (together with friends) for more natural flow!', role: 'tutor' },
+    ]},
+    { title: '📄 Reading Comprehension', subtitle: 'Learning French', messages: [
+      { from: 'Tutor', text: '📖 Read: "Le petit café au coin de la rue ouvre à 7h. Ils servent le meilleur croissant du quartier."\n\n❓ What time does the café open?\nA) 6h  B) 7h  C) 8h', role: 'tutor' },
+      { from: 'You', text: 'B!', role: 'student' },
+      { from: 'Tutor', text: '✅ Correct! "Ouvre à 7h" = opens at 7am.\n\n📌 Useful phrase: "au coin de la rue" means "on the street corner" — very common in giving directions!', role: 'tutor' },
+    ]},
+    { title: '🎭 Roleplay: At a Café', subtitle: 'Learning Korean', messages: [
+      { from: 'Tutor', text: '☕ You\'re at a Seoul café. Order a drink and a pastry!\n\n점원: 어서오세요! 주문하시겠어요?\n(Clerk: Welcome! Would you like to order?)', role: 'tutor' },
+      { from: 'You', text: '아메리카노 하나 주세요', role: 'student' },
+      { from: 'Tutor', text: '좋아요! 🎯 Perfect polite form with 주세요. Now try adding a pastry — hint: "그리고" means "and", "크로와상" is croissant!', role: 'tutor' },
+    ]},
+  ];
+
+  const [activeScene, setActiveScene] = useState(0);
+  const [visibleMessages, setVisibleMessages] = useState([]);
+
+  useEffect(() => {
+    setVisibleMessages([]);
+    const msgs = scenes[activeScene].messages;
+    const timers = [];
+    msgs.forEach((_, i) => {
+      timers.push(setTimeout(() => setVisibleMessages(prev => [...prev, i]), i * 1800 + 400));
+    });
+    const cycleTimer = setTimeout(() => setActiveScene(prev => (prev + 1) % scenes.length), msgs.length * 1800 + 3500);
+    return () => { timers.forEach(clearTimeout); clearTimeout(cycleTimer); };
+  }, [activeScene]);
+
+  const scene = scenes[activeScene];
+
+  return (
+    <div className="w-full max-w-lg mx-auto">
+      <div className="rounded-2xl overflow-hidden" style={{ ...S.card, border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <Award className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-white">{scene.title}</div>
+              <div className="text-xs text-gray-400">{scene.subtitle}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20">
+            <span className="text-[10px] text-purple-400 font-medium">AI TUTOR</span>
+          </div>
+        </div>
+        <div className="p-4 space-y-3 min-h-[280px]">
+          {scene.messages.map((msg, i) => visibleMessages.includes(i) && (
+            <div key={`${activeScene}-${i}`} className={`flex flex-col ${msg.role === 'student' ? 'items-end' : 'items-start'}`}
+              style={{ animation: 'fadeIn 0.4s ease-out' }}>
+              <span className="text-xs text-gray-500 mb-1 px-1">{msg.from}</span>
+              <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
+                msg.role === 'student'
+                  ? 'bg-purple-500/30 text-purple-100'
+                  : 'bg-white/10 text-gray-200'
+              }`}>
+                {msg.text}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-wrap justify-center gap-3 mt-6 px-4">
+        {scenes.map((s, i) => (
+          <button key={i} onClick={() => setActiveScene(i)}
+            className={`text-xs px-3 py-1.5 rounded-full transition-all ${i === activeScene ? 'bg-purple-500/30 text-purple-300 border border-purple-500/40' : 'bg-white/5 text-gray-500 border border-transparent hover:text-gray-300'}`}>
+            {s.title}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // FAQ ACCORDION
 // ============================================================================
 
@@ -493,6 +583,13 @@ function HomePage() {
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">A full language school in your pocket</h2>
               <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, conversation practice, writing, reading, quizzes, roleplay — 8 ways to practice, all powered by AI that remembers your strengths and weaknesses.</p>
+            </div>
+          </Reveal>
+
+          {/* Live tutor demo */}
+          <Reveal delay={0.1}>
+            <div className="mb-14">
+              <TutorChatDemo />
             </div>
           </Reveal>
 
