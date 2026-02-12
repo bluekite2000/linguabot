@@ -4,7 +4,7 @@ import {
   Gift, Sparkles, AlertCircle, Share2, UserPlus, ExternalLink,
   BookOpen, Brain, Trophy, ChevronDown,
   Award, Repeat, Compass, MessageSquare, Bot,
-  Edit3, FileText, Type, Shield,
+  Edit3, FileText, Type, Shield, Mic,
 } from 'lucide-react';
 
 // ============================================================================
@@ -335,6 +335,11 @@ function TutorChatDemo() {
       { from: 'You', text: '아메리카노 하나 주세요', role: 'student' },
       { from: 'Tutor', text: '좋아요! 🎯 Perfect polite form with 주세요. Now try adding a pastry — hint: "그리고" means "and", "크로와상" is croissant!', role: 'tutor' },
     ]},
+    { title: '🎙️ Voice Practice', subtitle: 'Speaking Spanish', messages: [
+      { from: 'Tutor', text: '🎙️ Repeat after me: "¿Dónde está la estación de tren?" (Where is the train station?)', role: 'tutor' },
+      { from: 'You', text: '🎙️ "Donde esta la estacion de tren"', role: 'student' },
+      { from: 'Tutor', text: '🎙️ Great attempt! Two tips:\n• Add the stress: "es-ta-CIÓN" — that accent mark matters!\n• The ¿ signals a question — your voice should rise at the end.\n\n🏆 Now try: "¿Cuánto cuesta un billete?" (How much is a ticket?)', role: 'tutor' },
+    ]},
   ];
 
   const [activeScene, setActiveScene] = useState(0);
@@ -454,8 +459,9 @@ const FAQS = [
   { q: 'What languages can I translate?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Russian, Arabic, Hindi, and more. Any pair works.' },
   { q: 'What languages can I learn?', a: 'The tutor teaches 6 languages: English, Spanish, French, Japanese, Chinese (Mandarin), and Korean. More coming soon.' },
   { q: 'How much does it cost?', a: 'You get 50k tokens free on signup. Invite a friend and you both get 10k more — unlimited invites. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. No subscriptions, no credit card needed.' },
-  { q: 'What types of lessons are available?', a: 'Structured curriculum classes, free conversation practice, 22 roleplay scenarios, vocabulary quizzes, spaced repetition review, writing practice with corrections, and reading comprehension with questions. All adapt to your level.' },
+  { q: 'What types of lessons are available?', a: 'Voice lessons with pronunciation feedback, structured curriculum classes, free conversation, 22 roleplay scenarios, vocabulary quizzes, spaced repetition review, writing practice with corrections, and reading comprehension. All adapt to your level — 9 practice modes total.' },
   { q: 'How does spaced repetition work?', a: 'Every word you learn gets tracked with the SM-2 algorithm. Words you struggle with come back more often. Use /review to practice due words — the bot schedules them automatically based on how well you remember.' },
+  { q: 'How do voice lessons work?', a: 'Send a voice message during any lesson — the bot transcribes your speech with Voxtral AI and gives pronunciation feedback. Voice Talk mode is designed specifically for speaking practice with shadow drills, tongue twisters, and conversation challenges. Voice messages work in Free Talk, Roleplay, and all other session types too.' },
   { q: 'What\'s the difference between Free Talk and Roleplay?', a: 'Free Talk is open conversation — chat about anything with gentle corrections. Roleplay puts you in a scenario (ordering at a café, job interview, seeing a doctor) with a goal to complete.' },
   { q: 'Can I use it for just translation or just learning?', a: 'Absolutely. Many people use only the translator in group chats. Others only use the tutor in DMs. They\'re independent features that share your token balance.' },
   { q: 'Does the bot work in DMs too?', a: 'Yes! DM the bot for tutoring and translation. Translation works both in groups and DMs — send any text and it translates based on your /setlang pairs.' },
@@ -482,7 +488,7 @@ function HomePage() {
           <Reveal delay={0.2}>
             <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
               A Telegram bot that translates group conversations in 20 languages near real-time,
-              and teaches you a new language with classes, conversation practice, writing, and reading.
+              and teaches you a new language with classes, voice practice, conversation, writing, and reading.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -494,7 +500,7 @@ function HomePage() {
           <Reveal delay={0.4}>
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-14 text-sm text-gray-500">
               <span className="font-semibold text-white text-2xl">20 <span className="text-sm font-normal text-gray-400">languages</span></span>
-              <span className="font-semibold text-white text-2xl">8 <span className="text-sm font-normal text-gray-400">practice modes</span></span>
+              <span className="font-semibold text-white text-2xl">9 <span className="text-sm font-normal text-gray-400">practice modes</span></span>
               <span className="font-semibold text-white text-2xl">36 <span className="text-sm font-normal text-gray-400">curriculum topics</span></span>
               <span className="font-semibold text-white text-2xl">0→B1 <span className="text-sm font-normal text-gray-400">path</span></span>
             </div>
@@ -582,7 +588,7 @@ function HomePage() {
                 <Award className="w-3.5 h-3.5" /> Language School
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">A full language school in your pocket</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, conversation practice, writing, reading, quizzes, roleplay — 8 ways to practice, all powered by AI that remembers your strengths and weaknesses.</p>
+              <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, voice lessons, conversation practice, writing, reading, quizzes, roleplay — 9 ways to practice, all powered by AI that remembers your strengths and weaknesses.</p>
             </div>
           </Reveal>
 
@@ -594,21 +600,24 @@ function HomePage() {
           </Reveal>
 
           {/* 8 Practice Modes — emphasize new ones */}
-          <div className="grid md:grid-cols-4 gap-4 mb-14">
+          <div className="grid md:grid-cols-3 gap-4 mb-14">
             {[
+              { icon: <Mic className="w-5 h-5" />, title: 'Voice Lessons', desc: 'Speak out loud! Get pronunciation feedback, shadow drills, and tongue twisters', color: 'rose', tag: 'NEW' },
               { icon: <BookOpen className="w-5 h-5" />, title: 'Structured Classes', desc: '36-topic curriculum from greetings to debate', color: 'purple', tag: null },
               { icon: <MessageSquare className="w-5 h-5" />, title: 'Free Conversation', desc: 'Chat about anything with real-time corrections', color: 'cyan', tag: null },
               { icon: <Compass className="w-5 h-5" />, title: 'Roleplay', desc: '22 real-life scenarios — café, airport, interview', color: 'amber', tag: null },
               { icon: <Brain className="w-5 h-5" />, title: 'Vocabulary Quiz', desc: 'Multiple choice, fill-in-the-blank, context clues', color: 'pink', tag: null },
-              { icon: <Edit3 className="w-5 h-5" />, title: 'Writing Practice', desc: 'Write responses to prompts, get detailed corrections & vocabulary upgrades', color: 'emerald', tag: 'NEW' },
-              { icon: <FileText className="w-5 h-5" />, title: 'Reading Comprehension', desc: 'Read passages, answer questions, learn useful phrases', color: 'blue', tag: 'NEW' },
+              { icon: <Edit3 className="w-5 h-5" />, title: 'Writing Practice', desc: 'Write responses, get corrections & vocabulary upgrades', color: 'emerald', tag: null },
+              { icon: <FileText className="w-5 h-5" />, title: 'Reading Comprehension', desc: 'Read passages, answer questions, learn phrases', color: 'blue', tag: null },
               { icon: <Repeat className="w-5 h-5" />, title: 'Spaced Repetition', desc: 'SM-2 algorithm schedules reviews at the right time', color: 'orange', tag: null },
               { icon: <Trophy className="w-5 h-5" />, title: 'Streaks & XP', desc: 'Daily streaks, levels, badges, and leaderboard', color: 'yellow', tag: null },
             ].map((m, i) => (
               <Reveal key={i} delay={i * 0.06}>
                 <div style={S.card} className="rounded-2xl p-5 h-full relative">
                   {m.tag && (
-                    <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                    <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      m.color === 'rose' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-400' : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                    }`}>
                       {m.tag}
                     </div>
                   )}
@@ -619,6 +628,72 @@ function HomePage() {
               </Reveal>
             ))}
           </div>
+
+          {/* ⭐ VOICE LESSONS — hero feature spotlight */}
+          <Reveal>
+            <div className="rounded-2xl p-1 mb-14 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.3), rgba(168,85,247,0.3), rgba(59,130,246,0.3))' }}>
+              <div className="rounded-xl p-6 md:p-8" style={{ background: 'linear-gradient(135deg, rgba(10,10,15,0.97) 0%, rgba(10,10,15,0.95) 100%)' }}>
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                  <div className="flex-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/15 border border-rose-500/25 text-rose-300 text-xs font-bold uppercase tracking-wider mb-4">
+                      <Mic className="w-3.5 h-3.5" /> New Feature
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-3">🎙️ Voice Lessons</h3>
+                    <p className="text-gray-400 mb-5">Send voice messages to practice speaking. Get real-time pronunciation feedback, shadow drills, tongue twisters, and conversation challenges — all powered by Voxtral AI transcription.</p>
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {[
+                        { emoji: '🗣️', text: 'Shadow repeating' },
+                        { emoji: '🎯', text: 'Pronunciation tips' },
+                        { emoji: '🎭', text: 'Voice roleplays' },
+                        { emoji: '🏆', text: 'XP & badges' },
+                        { emoji: '🔥', text: 'Tongue twisters' },
+                        { emoji: '📈', text: 'Difficulty scaling' },
+                      ].map((f, i) => (
+                        <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                          <span>{f.emoji}</span><span>{f.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold no-underline"
+                      style={{ background: 'linear-gradient(135deg, #e11d48 0%, #a855f7 100%)' }}>
+                      Try Voice Lessons <ArrowRight className="w-4 h-4" />
+                    </a>
+                  </div>
+                  <div className="w-full md:w-80 shrink-0">
+                    <div className="rounded-xl overflow-hidden" style={{ ...S.card, border: '1px solid rgba(244,63,94,0.15)' }}>
+                      <div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-purple-500 flex items-center justify-center">
+                          <Mic className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold">Voice Talk 🇪🇸</div>
+                          <div className="text-[10px] text-gray-500">Speaking practice</div>
+                        </div>
+                      </div>
+                      <div className="p-3 space-y-2.5 text-xs">
+                        <div className="flex flex-col items-start">
+                          <span className="text-[10px] text-gray-500 mb-0.5">Tutor</span>
+                          <div className="bg-white/10 rounded-xl px-3 py-2 text-gray-200 max-w-[90%]">🎙️ Repeat: "¿Cuánto cuesta?"</div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-gray-500 mb-0.5">You</span>
+                          <div className="bg-rose-500/25 rounded-xl px-3 py-2 text-rose-100 max-w-[90%] flex items-center gap-1.5">
+                            <Mic className="w-3 h-3 shrink-0" />
+                            <span>"Cuanto cuesta"</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <span className="text-[10px] text-gray-500 mb-0.5">Tutor</span>
+                          <div className="bg-white/10 rounded-xl px-3 py-2 text-gray-200 max-w-[90%]">⭐⭐⭐⭐ Great! Tip: stress the "CUES-ta". Now try: "¿Dónde está el baño?"</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
 
           {/* NEW: Writing & Reading deep dive */}
           <Reveal>
