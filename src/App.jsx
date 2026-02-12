@@ -4,7 +4,7 @@ import {
   Gift, Sparkles, AlertCircle, Share2, UserPlus, ExternalLink,
   BookOpen, Brain, Trophy, ChevronDown,
   Award, Repeat, Compass, MessageSquare, Bot,
-  Edit3, FileText, Type, Shield, Mic,
+  Edit3, FileText, Type, Shield, Mic, Headphones, Volume2, Target,
 } from 'lucide-react';
 
 // ============================================================================
@@ -346,6 +346,12 @@ function TutorChatDemo() {
       { from: 'You', text: '🎙️ "Donde esta la estacion de tren"', role: 'student' },
       { from: 'Tutor', text: '⭐⭐⭐⭐ Almost! Tip: stress "esta-CIÓN" — the accent matters!\n\n🎙️ Now try: "¿Cuánto cuesta un billete?"', role: 'tutor' },
     ]},
+    { title: '👂 Listening Practice', subtitle: 'Comprehension · French', messages: [
+      { from: 'Tutor', text: '🎧 Listen to this passage:\n🔊 "Marie va au marché tous les samedis. Elle achète des légumes frais et du fromage."', role: 'tutor' },
+      { from: 'Tutor', text: '📝 Questions:\n1. When does Marie go to the market?\n2. What does she buy?', role: 'tutor' },
+      { from: 'You', text: 'She goes on Saturdays and buys vegetables and cheese', role: 'student' },
+      { from: 'Tutor', text: '✅ Perfect! "Tous les samedis" = every Saturday.\n💡 New vocab: "légumes frais" = fresh vegetables\n\n🎧 Ready for the next passage? This one\'s harder...', role: 'tutor' },
+    ]},
   ];
 
   const [activeScene, setActiveScene] = useState(0);
@@ -465,11 +471,12 @@ const FAQS = [
   { q: 'What languages can I translate?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Russian, Arabic, Hindi, and more. Any pair works.' },
   { q: 'What languages can I learn?', a: 'The tutor teaches 6 languages: English, Spanish, French, Japanese, Chinese (Mandarin), and Korean. More coming soon.' },
   { q: 'How much does it cost?', a: 'You get 50k tokens free on signup. Invite a friend and you both get 10k more — unlimited invites. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. No subscriptions, no credit card needed.' },
-  { q: 'What types of lessons are available?', a: 'Voice lessons with pronunciation feedback, structured curriculum classes, free conversation, 22 roleplay scenarios, vocabulary quizzes, spaced repetition review, writing practice with corrections, and reading comprehension. All adapt to your level — 9 practice modes total.' },
+  { q: 'What types of lessons are available?', a: 'Voice lessons with pronunciation feedback, listening comprehension with AI voice notes, structured curriculum classes, free conversation, 22 roleplay scenarios, vocabulary quizzes, spaced repetition review, writing practice with corrections, and reading comprehension. All 10 practice modes adapt to your level and build toward B1 conversational fluency across listening, speaking, reading, and writing.' },
   { q: 'How does spaced repetition work?', a: 'Every word you learn gets tracked with the SM-2 algorithm. Words you struggle with come back more often. Use /review to practice due words — the bot schedules them automatically based on how well you remember.' },
   { q: 'How do voice lessons work?', a: 'Send a voice message during any lesson — the bot transcribes your speech with Voxtral AI and gives pronunciation feedback. Voice Talk mode is designed specifically for speaking practice with shadow drills, tongue twisters, and conversation challenges. Voice messages work in Free Talk, Roleplay, and all other session types too.' },
   { q: 'What\'s the difference between Free Talk and Roleplay?', a: 'Free Talk is open conversation — chat about anything with gentle corrections. Roleplay puts you in a scenario (ordering at a café, job interview, seeing a doctor) with a goal to complete.' },
   { q: 'Can I use it for just translation or just learning?', a: 'Absolutely. Many people use only the translator in group chats. Others only use the tutor in DMs. They\'re independent features that share your token balance.' },
+  { q: 'How long to reach B1?', a: 'At 30 minutes a day, the structured path takes about 18 weeks: ~4 weeks for A1 (survival basics), ~6 weeks for A2 (foundation grammar), ~8 weeks for B1 (conversational fluency). Each unit uses all 10 practice modes — classes, voice, listening, writing, reading, quiz, roleplay, free talk, and spaced repetition — so you build all four CEFR skills (listening, speaking, reading, writing) simultaneously.' },
   { q: 'Does the bot work in DMs too?', a: 'Yes! DM the bot for tutoring and translation. Translation works both in groups and DMs — send any text and it translates based on your /setlang pairs.' },
 ];
 
@@ -494,7 +501,7 @@ function HomePage() {
           <Reveal delay={0.2}>
             <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
               A Telegram bot that translates group conversations in 20 languages near real-time,
-              and teaches you a new language with classes, voice practice, conversation, writing, and reading.
+              and teaches you a new language from zero to B1 with 10 integrated practice modes — classes, voice, listening, conversation, writing, and reading.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -506,7 +513,7 @@ function HomePage() {
           <Reveal delay={0.4}>
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-14 text-sm text-gray-500">
               <span className="font-semibold text-white text-2xl">20 <span className="text-sm font-normal text-gray-400">languages</span></span>
-              <span className="font-semibold text-white text-2xl">9 <span className="text-sm font-normal text-gray-400">practice modes</span></span>
+              <span className="font-semibold text-white text-2xl">10 <span className="text-sm font-normal text-gray-400">practice modes</span></span>
               <span className="font-semibold text-white text-2xl">36 <span className="text-sm font-normal text-gray-400">curriculum topics</span></span>
               <span className="font-semibold text-white text-2xl">0→B1 <span className="text-sm font-normal text-gray-400">path</span></span>
             </div>
@@ -620,7 +627,7 @@ function HomePage() {
                 <Award className="w-3.5 h-3.5" /> Language School
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">A full language school in your pocket</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, voice lessons, conversation practice, writing, reading, quizzes, roleplay — 9 ways to practice, all powered by AI that remembers your strengths and weaknesses.</p>
+              <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, voice lessons, listening practice, conversation, writing, reading, quizzes, roleplay — 10 integrated practice modes that all work together to take you from zero to B1 conversational fluency.</p>
             </div>
           </Reveal>
 
@@ -635,7 +642,8 @@ function HomePage() {
           <div className="grid md:grid-cols-3 gap-4 mb-14">
             {[
               { icon: <Mic className="w-5 h-5" />, title: 'Voice Lessons', desc: 'Speak out loud! Get pronunciation feedback, shadow drills, and tongue twisters', color: 'rose', tag: 'NEW' },
-              { icon: <BookOpen className="w-5 h-5" />, title: 'Structured Classes', desc: '36-topic curriculum from greetings to debate', color: 'purple', tag: null },
+              { icon: <Headphones className="w-5 h-5" />, title: 'Listening Practice', desc: 'Hear native audio passages, answer comprehension questions — train your ear', color: 'sky', tag: 'NEW' },
+              { icon: <BookOpen className="w-5 h-5" />, title: 'Structured Classes', desc: '30-unit curriculum from greetings to debate', color: 'purple', tag: null },
               { icon: <MessageSquare className="w-5 h-5" />, title: 'Free Conversation', desc: 'Chat about anything with real-time corrections', color: 'cyan', tag: null },
               { icon: <Compass className="w-5 h-5" />, title: 'Roleplay', desc: '22 real-life scenarios — café, airport, interview', color: 'amber', tag: null },
               { icon: <Brain className="w-5 h-5" />, title: 'Vocabulary Quiz', desc: 'Multiple choice, fill-in-the-blank, context clues', color: 'pink', tag: null },
@@ -661,6 +669,81 @@ function HomePage() {
             ))}
           </div>
 
+          {/* ⭐ B1 SKILLS INTEGRATION MAP — how everything connects */}
+          <Reveal>
+            <div className="mb-14">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold uppercase tracking-wider mb-3">
+                  <Target className="w-3.5 h-3.5" /> B1 Integration
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold mb-3">Every lesson builds toward B1 fluency</h3>
+                <p className="text-gray-400 max-w-xl mx-auto text-sm">The four CEFR skills — listening, speaking, reading, and writing — aren't separate tracks. Every practice mode develops multiple skills at once.</p>
+              </div>
+
+              {/* Skills Matrix */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[
+                  { skill: '👂 Listening', cefr: 'B1', modes: ['Voice Talk', 'Listening Practice', 'Free Talk', 'Roleplay'], color: 'sky', desc: 'Understand native speech in familiar topics', pct: 100 },
+                  { skill: '🗣️ Speaking', cefr: 'B1', modes: ['Voice Talk', 'Free Talk', 'Roleplay', 'Class'], color: 'rose', desc: 'Hold conversations on everyday subjects', pct: 100 },
+                  { skill: '📖 Reading', cefr: 'B1', modes: ['Reading', 'Class', 'Quiz', 'Writing'], color: 'blue', desc: 'Read texts about familiar matters', pct: 100 },
+                  { skill: '✍️ Writing', cefr: 'B1', modes: ['Writing', 'Free Talk', 'Class', 'Quiz'], color: 'emerald', desc: 'Write about experiences and opinions', pct: 100 },
+                ].map((s, i) => (
+                  <Reveal key={i} delay={i * 0.08}>
+                    <div className="rounded-2xl p-5 h-full" style={{ background: `linear-gradient(135deg, rgba(var(--tw-color-${s.color}-500), 0.08) 0%, transparent 100%)`, border: `1px solid rgba(var(--tw-color-${s.color}-500), 0.15)`, ...S.card }}>
+                      <div className="text-xl mb-2">{s.skill}</div>
+                      <div className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mb-3 bg-${s.color}-500/20 text-${s.color}-400`}>CEFR {s.cefr}</div>
+                      <p className="text-xs text-gray-400 mb-3">{s.desc}</p>
+                      <div className="space-y-1">
+                        {s.modes.map((m, j) => (
+                          <div key={j} className="flex items-center gap-1.5 text-[11px] text-gray-300">
+                            <Check className={`w-3 h-3 text-${s.color}-400 shrink-0`} /><span>{m}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+
+              {/* How skills compound */}
+              <div style={S.card} className="rounded-2xl p-6 md:p-8">
+                <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg mb-3">How it compounds</h4>
+                    <div className="space-y-3 text-sm text-gray-400">
+                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">1.</span><span><strong className="text-gray-200">Class</strong> teaches grammar, vocabulary, and sentence patterns through structured lessons with quizzes at each gate.</span></div>
+                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">2.</span><span><strong className="text-gray-200">Free Talk & Roleplay</strong> put those patterns into live conversation — 22 scenarios from ordering food to job interviews.</span></div>
+                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">3.</span><span><strong className="text-gray-200">Voice Talk</strong> adds pronunciation, shadow drills, and listening comprehension — the speaking/listening loop that reaches B1.</span></div>
+                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">4.</span><span><strong className="text-gray-200">Writing & Reading</strong> develop literacy — write responses, get corrections, read passages, answer comprehension questions.</span></div>
+                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">5.</span><span><strong className="text-gray-200">Spaced Repetition</strong> ensures nothing is forgotten — SM-2 algorithm schedules reviews at the optimal interval.</span></div>
+                    </div>
+                  </div>
+                  <div className="w-full md:w-64 shrink-0">
+                    <div className="rounded-xl p-5" style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.1) 0%, rgba(59,130,246,0.1) 100%)', border: '1px solid rgba(168,85,247,0.2)' }}>
+                      <div className="text-center mb-3">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">B1</div>
+                        <div className="text-xs text-gray-400">Conversational Fluency</div>
+                      </div>
+                      <div className="space-y-2">
+                        {[
+                          { label: 'Understand main points of clear speech', done: true },
+                          { label: 'Handle travel situations', done: true },
+                          { label: 'Describe experiences & give opinions', done: true },
+                          { label: 'Write simple connected text', done: true },
+                        ].map((g, i) => (
+                          <div key={i} className="flex items-start gap-2 text-[11px]">
+                            <Check className="w-3 h-3 text-green-400 shrink-0 mt-0.5" />
+                            <span className="text-gray-300">{g.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
           {/* ⭐ VOICE LESSONS — hero feature spotlight */}
           <Reveal>
             <div className="rounded-2xl p-1 mb-14 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.3), rgba(168,85,247,0.3), rgba(59,130,246,0.3))' }}>
@@ -670,16 +753,16 @@ function HomePage() {
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/15 border border-rose-500/25 text-rose-300 text-xs font-bold uppercase tracking-wider mb-4">
                       <Mic className="w-3.5 h-3.5" /> New Feature
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-bold mb-3">🎙️ Voice Lessons</h3>
-                    <p className="text-gray-400 mb-5">Send voice messages to practice speaking. Get real-time pronunciation feedback, shadow drills, tongue twisters, and conversation challenges — all powered by Voxtral AI transcription.</p>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-3">🎙️ Voice & Listening</h3>
+                    <p className="text-gray-400 mb-5">Complete voice loop: speak and get pronunciation feedback, then listen to native audio passages and answer comprehension questions. Your path to B1 listening fluency — powered by Voxtral AI transcription and OpenAI text-to-speech.</p>
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       {[
                         { emoji: '🗣️', text: 'Shadow repeating' },
                         { emoji: '🎯', text: 'Pronunciation tips' },
+                        { emoji: '👂', text: 'Listening passages' },
+                        { emoji: '🔊', text: 'AI voice notes' },
                         { emoji: '🎭', text: 'Voice roleplays' },
-                        { emoji: '🏆', text: 'XP & badges' },
-                        { emoji: '🔥', text: 'Tongue twisters' },
-                        { emoji: '📈', text: 'Difficulty scaling' },
+                        { emoji: '📈', text: 'A1 → B1 path' },
                       ].map((f, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
                           <span>{f.emoji}</span><span>{f.text}</span>
@@ -689,7 +772,7 @@ function HomePage() {
                     <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold no-underline"
                       style={{ background: 'linear-gradient(135deg, #e11d48 0%, #a855f7 100%)' }}>
-                      Try Voice Lessons <ArrowRight className="w-4 h-4" />
+                      Try Voice & Listening <ArrowRight className="w-4 h-4" />
                     </a>
                   </div>
                   <div className="w-full md:w-80 shrink-0">
@@ -727,27 +810,36 @@ function HomePage() {
             </div>
           </Reveal>
 
-          {/* NEW: Writing & Reading deep dive */}
+          {/* NEW: Writing, Listening & Reading deep dive */}
           <Reveal>
-            <div className="grid md:grid-cols-2 gap-5 mb-14">
+            <div className="grid md:grid-cols-3 gap-5 mb-14">
               <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 100%)', border: '1px solid rgba(16,185,129,0.15)' }}>
-                <div className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">New</div>
                 <Edit3 className="w-8 h-8 text-emerald-400 mb-4" />
-                <h3 className="text-xl font-bold mb-3">✍️ Writing Practice</h3>
-                <p className="text-sm text-gray-400 mb-4">Get a prompt matched to your level. Write your response. The tutor provides detailed corrections with explanations, grammar notes, and vocabulary upgrades.</p>
+                <h3 className="text-lg font-bold mb-3">✍️ Writing</h3>
+                <p className="text-sm text-gray-400 mb-4">Get prompts matched to your level. Write responses. Get detailed corrections, grammar notes, and vocabulary upgrades.</p>
                 <div className="space-y-2 text-sm">
-                  {['Beginners: 2-3 sentences · Advanced: full paragraphs', 'Detailed corrections with explanations', 'Vocabulary upgrades suggested', '3-4 exchanges per session, earns XP'].map((f, i) => (
+                  {['Level-matched prompts', 'Detailed corrections', 'Vocabulary upgrades'].map((f, i) => (
                     <div key={i} className="flex items-center gap-2 text-gray-300"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /><span className="text-xs">{f}</span></div>
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(59,130,246,0.02) 100%)', border: '1px solid rgba(59,130,246,0.15)' }}>
-                <div className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-wider">New</div>
-                <FileText className="w-8 h-8 text-blue-400 mb-4" />
-                <h3 className="text-xl font-bold mb-3">📄 Reading Comprehension</h3>
-                <p className="text-sm text-gray-400 mb-4">Read short passages — menus, news snippets, or articles depending on your level. Answer comprehension questions and learn useful phrases from the text.</p>
+              <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(14,165,233,0.02) 100%)', border: '1px solid rgba(14,165,233,0.15)' }}>
+                <div className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-400 text-[10px] font-bold uppercase tracking-wider">New</div>
+                <Headphones className="w-8 h-8 text-sky-400 mb-4" />
+                <h3 className="text-lg font-bold mb-3">👂 Listening</h3>
+                <p className="text-sm text-gray-400 mb-4">Hear native audio passages via AI voice notes. Answer comprehension questions. Train your ear from A1 to B1.</p>
                 <div className="space-y-2 text-sm">
-                  {['Level-matched passages (menu → news → articles)', 'Multiple choice comprehension questions', 'Explains mistakes, highlights useful phrases', '2-3 passages per session, earns XP'].map((f, i) => (
+                  {['AI-generated voice notes', 'Comprehension questions', 'Progressive difficulty'].map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 text-gray-300"><Check className="w-3.5 h-3.5 text-sky-400 shrink-0" /><span className="text-xs">{f}</span></div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(59,130,246,0.02) 100%)', border: '1px solid rgba(59,130,246,0.15)' }}>
+                <FileText className="w-8 h-8 text-blue-400 mb-4" />
+                <h3 className="text-lg font-bold mb-3">📄 Reading</h3>
+                <p className="text-sm text-gray-400 mb-4">Read passages matched to your level — menus, news snippets, or articles. Answer questions and learn phrases.</p>
+                <div className="space-y-2 text-sm">
+                  {['Level-matched passages', 'Comprehension questions', 'Useful phrase extraction'].map((f, i) => (
                     <div key={i} className="flex items-center gap-2 text-gray-300"><Check className="w-3.5 h-3.5 text-blue-400 shrink-0" /><span className="text-xs">{f}</span></div>
                   ))}
                 </div>
@@ -758,42 +850,126 @@ function HomePage() {
           {/* Curriculum Timeline */}
           <Reveal>
             <div className="text-center mb-6">
-              <h3 className="text-2xl md:text-3xl font-bold mb-3">36 topics from "hello" to <em>holding a conversation</em></h3>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm">Each unit has 4 phases: lesson → practice → conversation → quiz. You don't move on until you prove you've learned it.</p>
+              <h3 className="text-2xl md:text-3xl font-bold mb-3">30 units from "hello" to <em>holding a conversation</em></h3>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">Each unit has 4 phases — and every practice mode feeds into them. You don't move on until you prove you've learned it.</p>
             </div>
           </Reveal>
 
+          {/* Expanded phase cards showing which modes connect */}
           <Reveal delay={0.1}>
-            <div className="flex flex-wrap justify-center gap-3 mb-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {[
-                { emoji: '📖', name: 'Lesson', desc: 'learn concepts', color: 'cyan' },
-                { emoji: '💪', name: 'Practice', desc: 'drills & exercises', color: 'amber' },
-                { emoji: '🗣️', name: 'Conversation', desc: 'use it live', color: 'emerald' },
-                { emoji: '✅', name: 'Quiz', desc: 'prove you know it', color: 'purple' },
+                { emoji: '📖', name: 'Lesson', desc: 'Learn grammar, vocab & patterns', color: 'cyan', modes: ['Class', 'Reading'] },
+                { emoji: '💪', name: 'Practice', desc: 'Drills, writing & vocab quiz', color: 'amber', modes: ['Quiz', 'Writing', 'Spaced Rep'] },
+                { emoji: '🗣️', name: 'Conversation', desc: 'Use it live — speak & listen', color: 'emerald', modes: ['Free Talk', 'Voice', 'Listening', 'Roleplay'] },
+                { emoji: '✅', name: 'Quiz', desc: 'Gate check — prove you know it', color: 'purple', modes: ['Assessment'] },
               ].map((p, i) => (
-                <div key={i} className={`flex items-center gap-2 px-4 py-2 rounded-full border border-${p.color}-500/30 bg-${p.color}-500/5 text-sm`}>
-                  <span>{p.emoji}</span>
-                  <span className="font-medium text-gray-200">{p.name}</span>
-                  <span className="text-gray-500 hidden sm:inline">— {p.desc}</span>
+                <div key={i} className={`rounded-xl p-4 border border-${p.color}-500/20 bg-${p.color}-500/5`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">{p.emoji}</span>
+                    <span className={`font-semibold text-sm text-${p.color}-300`}>{p.name}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">{p.desc}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {p.modes.map((m, j) => (
+                      <span key={j} className={`text-[9px] px-1.5 py-0.5 rounded bg-${p.color}-500/15 text-${p.color}-400`}>{m}</span>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
           </Reveal>
 
+          {/* Learning Loop + Time to B1 */}
+          <Reveal delay={0.15}>
+            <div className="grid md:grid-cols-2 gap-5 mb-10">
+              {/* Daily learning loop */}
+              <div style={S.card} className="rounded-2xl p-6">
+                <h4 className="font-bold text-sm mb-4 flex items-center gap-2"><Repeat className="w-4 h-4 text-purple-400" /> Daily Learning Loop</h4>
+                <div className="space-y-3">
+                  {[
+                    { step: '1', label: 'Warm up', detail: 'Spaced repetition review (2 min)', color: 'orange' },
+                    { step: '2', label: 'Study', detail: 'Curriculum lesson or class (5–10 min)', color: 'cyan' },
+                    { step: '3', label: 'Practice', detail: 'Writing prompt + vocab quiz (5 min)', color: 'amber' },
+                    { step: '4', label: 'Speak', detail: 'Voice talk or roleplay (5–10 min)', color: 'rose' },
+                    { step: '5', label: 'Listen', detail: 'Listening passage + comprehension (5 min)', color: 'sky' },
+                    { step: '6', label: 'Converse', detail: 'Free talk on today\'s topic (5–10 min)', color: 'emerald' },
+                  ].map((s, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className={`w-6 h-6 rounded-full bg-${s.color}-500/20 flex items-center justify-center text-[11px] font-bold text-${s.color}-400 shrink-0 mt-0.5`}>{s.step}</div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-200">{s.label}</div>
+                        <div className="text-xs text-gray-500">{s.detail}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pt-3 border-t border-white/5 text-center">
+                  <span className="text-xs text-gray-500">~30 min/day covers all 4 CEFR skills</span>
+                </div>
+              </div>
+
+              {/* Time to B1 estimate */}
+              <div style={S.card} className="rounded-2xl p-6">
+                <h4 className="font-bold text-sm mb-4 flex items-center gap-2"><Target className="w-4 h-4 text-cyan-400" /> Time to B1</h4>
+                <div className="space-y-4">
+                  {[
+                    { tier: 'A1 · Survival', units: '10 units', time: '~4 weeks', emoji: '🌱', skills: 'Basic phrases, numbers, ordering food', pct: 33 },
+                    { tier: 'A2 · Foundation', units: '10 units', time: '~6 weeks', emoji: '🌳', skills: 'Past tense, directions, hobbies, health', pct: 66 },
+                    { tier: 'B1 · Conversational', units: '10 units', time: '~8 weeks', emoji: '🗣️', skills: 'Opinions, debates, connected speech', pct: 100 },
+                  ].map((t, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-gray-200">{t.emoji} {t.tier}</span>
+                        <span className="text-xs text-gray-500">{t.time}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-white/5 overflow-hidden mb-1">
+                        <div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-cyan-500" style={{ width: `${t.pct}%` }} />
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-500">
+                        <span>{t.units}</span>
+                        <span>{t.skills}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pt-3 border-t border-white/5">
+                  <div className="text-center">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">~18 weeks</span>
+                    <div className="text-xs text-gray-500 mt-1">at 30 min/day to reach B1 conversational fluency</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
           <div className="space-y-6">
-            {CURRICULUM.map((tier, ti) => (
+            {CURRICULUM.map((tier, ti) => {
+              const tierSkills = [
+                ti === 0 ? ['👂 Basic listening', '🗣️ Simple phrases', '📖 Signs & menus'] : 
+                ti === 1 ? ['👂 Follow stories', '🗣️ Past & future tense', '📖 Short texts', '✍️ Simple messages'] :
+                ['👂 Native speed speech', '🗣️ Opinions & debate', '📖 Articles & reports', '✍️ Essays & emails']
+              ][0];
+              return (
               <Reveal key={ti} delay={ti * 0.1}>
                 <div style={S.card} className="rounded-2xl p-6 md:p-8">
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="text-2xl">{tier.emoji}</span>
-                    <div>
-                      <h3 className="font-bold text-lg">Tier {tier.tier}: {tier.name}</h3>
-                      <span className="text-xs text-gray-500">CEFR {tier.cefr} · Units {(tier.tier - 1) * 10 + 1}–{tier.tier * 10}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{tier.emoji}</span>
+                      <div>
+                        <h3 className="font-bold text-lg">Tier {tier.tier}: {tier.name}</h3>
+                        <span className="text-xs text-gray-500">CEFR {tier.cefr} · Units {(tier.tier - 1) * 10 + 1}–{tier.tier * 10}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 sm:ml-auto">
+                      {tierSkills.map((s, i) => (
+                        <span key={i} className={`text-[10px] px-2 py-0.5 rounded-full border bg-${tier.color}-500/10 border-${tier.color}-500/20 text-${tier.color}-300`}>{s}</span>
+                      ))}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {tier.units.map((u, i) => {
-                      const isGate = u.includes('🏁');
+                      const isGate = u.includes('🏁') || u.includes('🎓');
                       return (
                         <span key={i} className={`text-xs px-3 py-1.5 rounded-full border ${isGate ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 font-medium' : 'bg-white/5 border-white/5 text-gray-400'}`}>
                           {u}
@@ -803,7 +979,7 @@ function HomePage() {
                   </div>
                 </div>
               </Reveal>
-            ))}
+            )})}
           </div>
 
           {/* Tutor languages */}
