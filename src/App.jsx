@@ -239,6 +239,11 @@ function GroupChatDemo() {
       { from: 'David', text: 'Not yet mom! What did you cook?', translation: '🇻🇳 Chưa mẹ ơi! Mẹ nấu gì?', side: 'right', flag: '🇺🇸' },
       { from: 'Mẹ', text: 'Phở bò nhé, về sớm đi con 🍜', translation: '🇺🇸 Beef pho, come home early 🍜', side: 'left', flag: '🇻🇳' },
     ]},
+    { title: '🎙️ Voice Messages', subtitle: '3 members · voice + text', messages: [
+      { from: 'Hà', text: '🎙️ "Anh ơi, em đang ở sân bay rồi, đợi em chút nhé"', translation: '🇺🇸 "Bro, I\'m at the airport already, wait for me a bit"', side: 'left', flag: '🇻🇳', isVoice: true },
+      { from: 'Jake', text: 'Got it! I\'ll pick you up at arrivals', translation: '🇻🇳 Được rồi! Anh sẽ đón em ở cửa đến', side: 'right', flag: '🇺🇸' },
+      { from: 'Hà', text: '🎙️ "Cảm ơn anh, khoảng 20 phút nữa em ra"', translation: '🇺🇸 "Thanks, I\'ll be out in about 20 minutes"', side: 'left', flag: '🇻🇳', isVoice: true },
+    ]},
   ];
 
   const [activeConvo, setActiveConvo] = useState(0);
@@ -278,12 +283,13 @@ function GroupChatDemo() {
             <span className="text-[10px] text-green-400 font-medium">LIVE</span>
           </div>
         </div>
-        <div className="p-4 space-y-4 min-h-[280px]">
+        <div className="p-4 space-y-4" style={{ minHeight: 320, height: 320, overflowY: 'auto' }}>
           {convo.messages.map((msg, i) => visibleMessages.includes(i) && (
             <div key={`${activeConvo}-${i}`} className={`flex flex-col ${msg.side === 'right' ? 'items-end' : 'items-start'}`}
               style={{ animation: 'fadeIn 0.4s ease-out' }}>
               <span className="text-xs text-gray-500 mb-1 px-1">{msg.flag} {msg.from}</span>
-              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${msg.side === 'right' ? 'bg-purple-500/30 text-purple-100' : 'bg-white/10 text-gray-200'}`}>
+              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${msg.side === 'right' ? 'bg-purple-500/30 text-purple-100' : 'bg-white/10 text-gray-200'} ${msg.isVoice ? 'flex items-center gap-2' : ''}`}>
+                {msg.isVoice && <Mic className="w-3.5 h-3.5 shrink-0 opacity-60" />}
                 {msg.text}
               </div>
               {showTranslation[i] && (
@@ -336,9 +342,9 @@ function TutorChatDemo() {
       { from: 'Tutor', text: '좋아요! 🎯 Perfect polite form with 주세요. Now try adding a pastry — hint: "그리고" means "and", "크로와상" is croissant!', role: 'tutor' },
     ]},
     { title: '🎙️ Voice Practice', subtitle: 'Speaking Spanish', messages: [
-      { from: 'Tutor', text: '🎙️ Repeat after me: "¿Dónde está la estación de tren?" (Where is the train station?)', role: 'tutor' },
+      { from: 'Tutor', text: '🎙️ Repeat after me: "¿Dónde está la estación de tren?"', role: 'tutor' },
       { from: 'You', text: '🎙️ "Donde esta la estacion de tren"', role: 'student' },
-      { from: 'Tutor', text: '🎙️ Great attempt! Two tips:\n• Add the stress: "es-ta-CIÓN" — that accent mark matters!\n• The ¿ signals a question — your voice should rise at the end.\n\n🏆 Now try: "¿Cuánto cuesta un billete?" (How much is a ticket?)', role: 'tutor' },
+      { from: 'Tutor', text: '⭐⭐⭐⭐ Almost! Tip: stress "esta-CIÓN" — the accent matters!\n\n🎙️ Now try: "¿Cuánto cuesta un billete?"', role: 'tutor' },
     ]},
   ];
 
@@ -375,7 +381,7 @@ function TutorChatDemo() {
             <span className="text-[10px] text-purple-400 font-medium">AI TUTOR</span>
           </div>
         </div>
-        <div className="p-4 space-y-3 min-h-[280px]">
+        <div className="p-4 space-y-3" style={{ minHeight: 320, height: 320, overflowY: 'auto' }}>
           {scene.messages.map((msg, i) => visibleMessages.includes(i) && (
             <div key={`${activeScene}-${i}`} className={`flex flex-col ${msg.role === 'student' ? 'items-end' : 'items-start'}`}
               style={{ animation: 'fadeIn 0.4s ease-out' }}>
@@ -455,7 +461,7 @@ const CURRICULUM = [
 ];
 
 const FAQS = [
-  { q: 'How does translation work in group chats?', a: 'Add @linguaxyz_bot to any group. Each member sets their language pairs with /setlang. The bot translates every message near real-time — no commands needed. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English. Everyone speaks their language, everyone understands each other.' },
+  { q: 'How does translation work in group chats?', a: 'Add @linguaxyz_bot to any group. Each member sets their language pairs with /setlang. The bot translates every text message and voice note near real-time — no commands needed. Voice notes are automatically transcribed then translated. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English.' },
   { q: 'What languages can I translate?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Russian, Arabic, Hindi, and more. Any pair works.' },
   { q: 'What languages can I learn?', a: 'The tutor teaches 6 languages: English, Spanish, French, Japanese, Chinese (Mandarin), and Korean. More coming soon.' },
   { q: 'How much does it cost?', a: 'You get 50k tokens free on signup. Invite a friend and you both get 10k more — unlimited invites. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. No subscriptions, no credit card needed.' },
@@ -481,7 +487,7 @@ function HomePage() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Translate your group chats.<br />
+              Translate chats — text & voice.<br />
               <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">Learn any language.</span>
             </h1>
           </Reveal>
@@ -518,8 +524,8 @@ function HomePage() {
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold uppercase tracking-wider mb-4">
                 <Globe className="w-3.5 h-3.5" /> Translation
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Group chat translation, near real-time</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Add the bot to any Telegram group. Everyone speaks their language — the bot translates every message automatically. No commands, no delays. Just talk.</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Group chat translation — text & voice</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">Add the bot to any Telegram group. Everyone speaks their language — the bot translates every message automatically. Send text or voice notes — both get translated instantly.</p>
             </div>
           </Reveal>
 
@@ -530,19 +536,45 @@ function HomePage() {
 
           {/* Translation features */}
           <Reveal delay={0.2}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-14">
               {[
+                { icon: <Mic className="w-5 h-5" />, title: 'Voice messages', desc: 'Send voice notes — auto-transcribed and translated', color: 'rose', tag: 'NEW' },
                 { icon: <Users className="w-5 h-5" />, title: 'Group chats', desc: 'Everyone speaks their language, everyone understands', color: 'cyan' },
                 { icon: <Zap className="w-5 h-5" />, title: 'Near real-time', desc: 'Translations appear within seconds', color: 'amber' },
                 { icon: <Type className="w-5 h-5" />, title: '20 languages', desc: 'Any pair — Vietnamese, English, Japanese, and more', color: 'purple' },
                 { icon: <Shield className="w-5 h-5" />, title: 'Just /setlang', desc: 'One command to set up, then fully automatic', color: 'green' },
               ].map((f, i) => (
-                <div key={i} style={S.card} className="rounded-xl p-5 text-center">
+                <div key={i} style={S.card} className="rounded-xl p-5 text-center relative">
+                  {f.tag && (
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[9px] font-bold uppercase tracking-wider">
+                      {f.tag}
+                    </div>
+                  )}
                   <div className={`w-10 h-10 rounded-lg bg-${f.color}-500/20 flex items-center justify-center mx-auto mb-3 text-${f.color}-400`}>{f.icon}</div>
                   <div className="text-sm font-semibold mb-1">{f.title}</div>
                   <div className="text-xs text-gray-500">{f.desc}</div>
                 </div>
               ))}
+            </div>
+          </Reveal>
+
+          {/* Voice Translation callout */}
+          <Reveal delay={0.25}>
+            <div className="mt-10 rounded-2xl p-1 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.25), rgba(6,182,212,0.25))' }}>
+              <div className="rounded-xl p-5 md:p-6 flex flex-col md:flex-row items-center gap-5" style={{ background: 'rgba(10,10,15,0.95)' }}>
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-cyan-500/20 flex items-center justify-center shrink-0 border border-rose-500/20">
+                  <Mic className="w-7 h-7 text-rose-400" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h4 className="font-bold text-base mb-1">🎙️ Voice messages now translate too</h4>
+                  <p className="text-sm text-gray-400">Send a voice note in any language — the bot transcribes it with Voxtral AI, then translates for everyone in the group. Works in DMs too. Text and voice, same seamless flow.</p>
+                </div>
+                <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl text-white text-sm font-semibold no-underline shrink-0"
+                  style={{ background: 'linear-gradient(135deg, #e11d48, #06b6d4)' }}>
+                  Try it
+                </a>
+              </div>
             </div>
           </Reveal>
 
@@ -554,7 +586,7 @@ function HomePage() {
                 {[
                   { step: '1', title: 'Add bot to group', desc: 'Add @linguaxyz_bot to any Telegram group chat.' },
                   { step: '2', title: 'Each person runs /setlang', desc: 'Pick your language pair — Vietnamese↔English, Japanese↔English, etc.' },
-                  { step: '3', title: 'Just chat normally', desc: 'The bot translates every message automatically. No /translate commands needed.' },
+                  { step: '3', title: 'Chat — text or voice', desc: 'Type messages or send voice notes. The bot transcribes and translates everything automatically.' },
                 ].map((s, i) => (
                   <div key={i} className="text-center">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-sm font-bold mx-auto mb-3">{s.step}</div>
@@ -902,8 +934,8 @@ function HomePage() {
       {/* CTA */}
       <div className="py-20 px-6 text-center">
         <Reveal>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Start translating. Start learning.</h2>
-          <p className="text-gray-400 mb-8 max-w-lg mx-auto">One Telegram bot for both. No signup, no credit card, 50k tokens free.</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Start translating. Start speaking. Start learning.</h2>
+          <p className="text-gray-400 mb-8 max-w-lg mx-auto">One Telegram bot for all of it. No signup, no credit card, 50k tokens free.</p>
           <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
             style={S.btnP} className="px-8 py-4 rounded-xl text-white font-semibold text-lg inline-flex items-center gap-2 no-underline">
             Start on Telegram <ArrowRight className="w-5 h-5" />
