@@ -676,27 +676,29 @@ function HomePage() {
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold uppercase tracking-wider mb-3">
                   <Target className="w-3.5 h-3.5" /> B1 Integration
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold mb-3">Every lesson builds toward B1 fluency</h3>
-                <p className="text-gray-400 max-w-xl mx-auto text-sm">The four CEFR skills — listening, speaking, reading, and writing — aren't separate tracks. Every practice mode develops multiple skills at once.</p>
+                <h3 className="text-2xl md:text-3xl font-bold mb-3">Every lesson builds <em>toward</em> B1 fluency</h3>
+                <p className="text-gray-400 max-w-xl mx-auto text-sm">Start at zero. The four CEFR skills — listening, speaking, reading, and writing — aren't separate tracks. Every practice mode develops multiple skills at once, taking you from your first word to real conversation.</p>
               </div>
 
-              {/* Skills Matrix */}
+              {/* Skills Matrix — shows what you'll achieve, not current state */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
-                  { skill: '👂 Listening', cefr: 'B1', modes: ['Voice Talk', 'Listening Practice', 'Free Talk', 'Roleplay'], color: 'sky', desc: 'Understand native speech in familiar topics', pct: 100 },
-                  { skill: '🗣️ Speaking', cefr: 'B1', modes: ['Voice Talk', 'Free Talk', 'Roleplay', 'Class'], color: 'rose', desc: 'Hold conversations on everyday subjects', pct: 100 },
-                  { skill: '📖 Reading', cefr: 'B1', modes: ['Reading', 'Class', 'Quiz', 'Writing'], color: 'blue', desc: 'Read texts about familiar matters', pct: 100 },
-                  { skill: '✍️ Writing', cefr: 'B1', modes: ['Writing', 'Free Talk', 'Class', 'Quiz'], color: 'emerald', desc: 'Write about experiences and opinions', pct: 100 },
+                  { skill: '👂 Listening', target: 'B1', modes: ['Voice Talk', 'Listening Practice', 'Free Talk', 'Roleplay'], color: 'sky', desc: 'Understand native speech on familiar topics', journey: 'A1: simple words → A2: short conversations → B1: native speed' },
+                  { skill: '🗣️ Speaking', target: 'B1', modes: ['Voice Talk', 'Free Talk', 'Roleplay', 'Class'], color: 'rose', desc: 'Hold conversations on everyday subjects', journey: 'A1: basic phrases → A2: simple exchanges → B1: fluid conversation' },
+                  { skill: '📖 Reading', target: 'B1', modes: ['Reading', 'Class', 'Quiz', 'Writing'], color: 'blue', desc: 'Read texts about familiar matters', journey: 'A1: signs & menus → A2: short texts → B1: articles & reports' },
+                  { skill: '✍️ Writing', target: 'B1', modes: ['Writing', 'Free Talk', 'Class', 'Quiz'], color: 'emerald', desc: 'Write about experiences and opinions', journey: 'A1: simple forms → A2: short messages → B1: essays & emails' },
                 ].map((s, i) => (
                   <Reveal key={i} delay={i * 0.08}>
                     <div className="rounded-2xl p-5 h-full" style={{ background: `linear-gradient(135deg, rgba(var(--tw-color-${s.color}-500), 0.08) 0%, transparent 100%)`, border: `1px solid rgba(var(--tw-color-${s.color}-500), 0.15)`, ...S.card }}>
                       <div className="text-xl mb-2">{s.skill}</div>
-                      <div className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mb-3 bg-${s.color}-500/20 text-${s.color}-400`}>CEFR {s.cefr}</div>
+                      <div className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mb-3 bg-${s.color}-500/20 text-${s.color}-400`}>Goal: {s.target}</div>
                       <p className="text-xs text-gray-400 mb-3">{s.desc}</p>
+                      <p className="text-[10px] text-gray-500 mb-3 italic">{s.journey}</p>
                       <div className="space-y-1">
+                        <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Trained by:</div>
                         {s.modes.map((m, j) => (
                           <div key={j} className="flex items-center gap-1.5 text-[11px] text-gray-300">
-                            <Check className={`w-3 h-3 text-${s.color}-400 shrink-0`} /><span>{m}</span>
+                            <ArrowRight className={`w-3 h-3 text-${s.color}-400 shrink-0`} /><span>{m}</span>
                           </div>
                         ))}
                       </div>
@@ -721,19 +723,21 @@ function HomePage() {
                   <div className="w-full md:w-64 shrink-0">
                     <div className="rounded-xl p-5" style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.1) 0%, rgba(59,130,246,0.1) 100%)', border: '1px solid rgba(168,85,247,0.2)' }}>
                       <div className="text-center mb-3">
+                        <div className="text-[10px] text-gray-500 uppercase tracking-wider">Your destination</div>
                         <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">B1</div>
                         <div className="text-xs text-gray-400">Conversational Fluency</div>
                       </div>
+                      <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">You'll be able to:</div>
                       <div className="space-y-2">
                         {[
-                          { label: 'Understand main points of clear speech', done: true },
-                          { label: 'Handle travel situations', done: true },
-                          { label: 'Describe experiences & give opinions', done: true },
-                          { label: 'Write simple connected text', done: true },
+                          'Understand main points of clear speech',
+                          'Handle travel situations confidently',
+                          'Describe experiences & give opinions',
+                          'Write simple connected text',
                         ].map((g, i) => (
                           <div key={i} className="flex items-start gap-2 text-[11px]">
-                            <Check className="w-3 h-3 text-green-400 shrink-0 mt-0.5" />
-                            <span className="text-gray-300">{g.label}</span>
+                            <Target className="w-3 h-3 text-purple-400 shrink-0 mt-0.5" />
+                            <span className="text-gray-300">{g}</span>
                           </div>
                         ))}
                       </div>
