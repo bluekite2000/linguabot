@@ -471,12 +471,12 @@ const FAQS = [
   { q: 'What languages can I translate?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Russian, Arabic, Hindi, and more. Any pair works.' },
   { q: 'What languages can I learn?', a: 'The tutor teaches 6 languages: English, Spanish, French, Japanese, Chinese (Mandarin), and Korean. More coming soon.' },
   { q: 'How much does it cost?', a: 'You get 50k tokens free on signup. Invite a friend and you both get 10k more — unlimited invites. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. No subscriptions, no credit card needed.' },
-  { q: 'What types of lessons are available?', a: 'Voice lessons with pronunciation feedback, listening comprehension with AI voice notes, structured curriculum classes, free conversation, 22 roleplay scenarios, vocabulary quizzes, spaced repetition review, writing practice with corrections, and reading comprehension. All 10 practice modes adapt to your level and build toward B1 conversational fluency across listening, speaking, reading, and writing.' },
+  { q: 'What types of lessons are available?', a: 'Voice lessons with pronunciation feedback, listening comprehension with AI voice notes, structured curriculum classes, free conversation, 22 roleplay scenarios, vocabulary quizzes, spaced repetition review, writing practice with corrections, reading comprehension, and adaptive difficulty that adjusts based on your quiz scores. All 11 practice modes build toward B1 conversational fluency across listening, speaking, reading, and writing.' },
   { q: 'How does spaced repetition work?', a: 'Every word you learn gets tracked with the SM-2 algorithm. Words you struggle with come back more often. Use /review to practice due words — the bot schedules them automatically based on how well you remember.' },
   { q: 'How do voice lessons work?', a: 'Send a voice message during any lesson — the bot transcribes your speech with Voxtral AI and gives pronunciation feedback. Voice Talk mode is designed specifically for speaking practice with shadow drills, tongue twisters, and conversation challenges. Voice messages work in Free Talk, Roleplay, and all other session types too.' },
   { q: 'What\'s the difference between Free Talk and Roleplay?', a: 'Free Talk is open conversation — chat about anything with gentle corrections. Roleplay puts you in a scenario (ordering at a café, job interview, seeing a doctor) with a goal to complete.' },
   { q: 'Can I use it for just translation or just learning?', a: 'Absolutely. Many people use only the translator in group chats. Others only use the tutor in DMs. They\'re independent features that share your token balance.' },
-  { q: 'How long to reach B1?', a: 'At 30 minutes a day, the structured path takes about 18 weeks: ~4 weeks for A1 (survival basics), ~6 weeks for A2 (foundation grammar), ~8 weeks for B1 (conversational fluency). Each unit uses all 10 practice modes — classes, voice, listening, writing, reading, quiz, roleplay, free talk, and spaced repetition — so you build all four CEFR skills (listening, speaking, reading, writing) simultaneously.' },
+  { q: 'How long to reach B1?', a: 'At 30 minutes a day, the structured path takes about 18 weeks: ~4 weeks for A1 (survival basics), ~6 weeks for A2 (foundation grammar), ~8 weeks for B1 (conversational fluency). Adaptive difficulty adjusts to your performance — score an A and lessons get harder; struggle and they ease up. Each unit uses classes, voice, listening, writing, reading, quiz, roleplay, free talk, and spaced repetition so you build all four CEFR skills simultaneously.' },
   { q: 'Does the bot work in DMs too?', a: 'Yes! DM the bot for tutoring and translation. Translation works both in groups and DMs — send any text and it translates based on your /setlang pairs.' },
 ];
 
@@ -501,7 +501,7 @@ function HomePage() {
           <Reveal delay={0.2}>
             <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
               A Telegram bot that translates group conversations in 20 languages near real-time,
-              and teaches you a new language from zero to B1 with 10 integrated practice modes — classes, voice, listening, conversation, writing, and reading.
+              and teaches you a new language from zero to B1 with 11 integrated practice modes — adaptive difficulty, classes, voice, listening, conversation, writing, and reading.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -513,7 +513,7 @@ function HomePage() {
           <Reveal delay={0.4}>
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-14 text-sm text-gray-500">
               <span className="font-semibold text-white text-2xl">20 <span className="text-sm font-normal text-gray-400">languages</span></span>
-              <span className="font-semibold text-white text-2xl">10 <span className="text-sm font-normal text-gray-400">practice modes</span></span>
+              <span className="font-semibold text-white text-2xl">11 <span className="text-sm font-normal text-gray-400">practice modes</span></span>
               <span className="font-semibold text-white text-2xl">36 <span className="text-sm font-normal text-gray-400">curriculum topics</span></span>
               <span className="font-semibold text-white text-2xl">0→B1 <span className="text-sm font-normal text-gray-400">path</span></span>
             </div>
@@ -627,7 +627,7 @@ function HomePage() {
                 <Award className="w-3.5 h-3.5" /> Language School
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">A full language school in your pocket</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, voice lessons, listening practice, conversation, writing, reading, quizzes, roleplay — 10 integrated practice modes that all work together to take you from zero to B1 conversational fluency.</p>
+              <p className="text-gray-400 max-w-2xl mx-auto">Structured classes, voice lessons, listening practice, conversation, writing, reading, quizzes, roleplay — 11 integrated practice modes with adaptive difficulty that adjusts to your performance, taking you from zero to B1 conversational fluency.</p>
             </div>
           </Reveal>
 
@@ -650,13 +650,14 @@ function HomePage() {
               { icon: <Edit3 className="w-5 h-5" />, title: 'Writing Practice', desc: 'Write responses, get corrections & vocabulary upgrades', color: 'emerald', tag: null },
               { icon: <FileText className="w-5 h-5" />, title: 'Reading Comprehension', desc: 'Read passages, answer questions, learn phrases', color: 'blue', tag: null },
               { icon: <Repeat className="w-5 h-5" />, title: 'Spaced Repetition', desc: 'SM-2 algorithm schedules reviews at the right time', color: 'orange', tag: null },
-              { icon: <Trophy className="w-5 h-5" />, title: 'Streaks & XP', desc: 'Daily streaks, levels, badges, and leaderboard', color: 'yellow', tag: null },
+              { icon: <Zap className="w-5 h-5" />, title: 'Adaptive Difficulty', desc: 'Score an A? It gets harder. Struggling? It eases up. Always in your zone.', color: 'yellow', tag: 'NEW' },
+              { icon: <Trophy className="w-5 h-5" />, title: 'Streaks & XP', desc: 'Daily streaks, levels, badges, and leaderboard', color: 'violet', tag: null },
             ].map((m, i) => (
               <Reveal key={i} delay={i * 0.06}>
                 <div style={S.card} className="rounded-2xl p-5 h-full relative">
                   {m.tag && (
                     <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      m.color === 'rose' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-400' : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                      m.color === 'rose' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-400' : m.color === 'yellow' ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-400' : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
                     }`}>
                       {m.tag}
                     </div>
@@ -717,7 +718,8 @@ function HomePage() {
                       <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">2.</span><span><strong className="text-gray-200">Free Talk & Roleplay</strong> put those patterns into live conversation — 22 scenarios from ordering food to job interviews.</span></div>
                       <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">3.</span><span><strong className="text-gray-200">Voice Talk</strong> adds pronunciation, shadow drills, and listening comprehension — the speaking/listening loop that reaches B1.</span></div>
                       <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">4.</span><span><strong className="text-gray-200">Writing & Reading</strong> develop literacy — write responses, get corrections, read passages, answer comprehension questions.</span></div>
-                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">5.</span><span><strong className="text-gray-200">Spaced Repetition</strong> ensures nothing is forgotten — SM-2 algorithm schedules reviews at the optimal interval.</span></div>
+                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">5.</span><span><strong className="text-gray-200">Adaptive Difficulty</strong> watches your quiz scores — ace it and the next lesson pushes harder; struggle and it eases back. You're always in the sweet spot.</span></div>
+                      <div className="flex gap-3"><span className="text-purple-400 font-bold shrink-0">6.</span><span><strong className="text-gray-200">Spaced Repetition</strong> ensures nothing is forgotten — SM-2 algorithm schedules reviews at the optimal interval.</span></div>
                     </div>
                   </div>
                   <div className="w-full md:w-64 shrink-0">
