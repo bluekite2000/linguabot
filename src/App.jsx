@@ -295,7 +295,11 @@ function GroupChatDemo() {
               {showTranslation[i] && (
                 <div className="max-w-[85%] rounded-2xl px-4 py-2 text-sm mt-1 border bg-cyan-500/10 border-cyan-500/20 text-cyan-200"
                   style={{ animation: 'fadeIn 0.3s ease-out' }}>
-                  {msg.translation}
+                  <div>{msg.translation}</div>
+                  <div className="flex items-center gap-1.5 mt-1.5 text-[10px] text-cyan-400/60">
+                    <Volume2 className="w-3 h-3" />
+                    <span>Hear it</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -467,7 +471,7 @@ const CURRICULUM = [
 ];
 
 const FAQS = [
-  { q: 'How does translation work in group chats?', a: 'Add @linguaxyz_bot to any group. Each member sets their language pairs with /setlang. The bot translates every text message and voice note near real-time — no commands needed. Voice notes are automatically transcribed then translated. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English.' },
+  { q: 'How does translation work in group chats?', a: 'Add @linguaxyz_bot to any group. Each member sets their language pairs with /setlang. The bot translates every text message and voice note near real-time — no commands needed. Voice notes are automatically transcribed then translated. Tap 🔊 Hear it on any translation to hear it spoken aloud. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English.' },
   { q: 'What languages can I translate?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Russian, Arabic, Hindi, and more. Any pair works.' },
   { q: 'What languages can I learn?', a: 'The tutor teaches 6 languages: English, Spanish, French, Japanese, Chinese (Mandarin), and Korean. More coming soon.' },
   { q: 'How much does it cost?', a: 'You get 50k tokens free on signup. Invite a friend and you both get 10k more — unlimited invites. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. No subscriptions, no credit card needed.' },
@@ -532,7 +536,7 @@ function HomePage() {
                 <Globe className="w-3.5 h-3.5" /> Translation
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Group chat translation — text & voice</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Add the bot to any Telegram group. Everyone speaks their language — the bot translates every message automatically. Send text or voice notes — both get translated instantly.</p>
+              <p className="text-gray-400 max-w-2xl mx-auto">Add the bot to any Telegram group. Everyone speaks their language — the bot translates every message automatically. Send text or voice notes — both get translated instantly. Tap 🔊 to hear any translation spoken aloud.</p>
             </div>
           </Reveal>
 
@@ -546,6 +550,7 @@ function HomePage() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-14">
               {[
                 { icon: <Mic className="w-5 h-5" />, title: 'Voice messages', desc: 'Send voice notes — auto-transcribed and translated', color: 'rose', tag: 'NEW' },
+                { icon: <Volume2 className="w-5 h-5" />, title: '🔊 Hear it', desc: 'Tap to hear any translation spoken aloud with AI voice', color: 'cyan', tag: 'NEW' },
                 { icon: <Users className="w-5 h-5" />, title: 'Group chats', desc: 'Everyone speaks their language, everyone understands', color: 'cyan' },
                 { icon: <Zap className="w-5 h-5" />, title: 'Near real-time', desc: 'Translations appear within seconds', color: 'amber' },
                 { icon: <Type className="w-5 h-5" />, title: '20 languages', desc: 'Any pair — Vietnamese, English, Japanese, and more', color: 'purple' },
@@ -553,7 +558,9 @@ function HomePage() {
               ].map((f, i) => (
                 <div key={i} style={S.card} className="rounded-xl p-5 text-center relative">
                   {f.tag && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[9px] font-bold uppercase tracking-wider">
+                    <div className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                      f.color === 'cyan' ? 'bg-cyan-500/20 border border-cyan-500/30 text-cyan-400' : 'bg-rose-500/20 border border-rose-500/30 text-rose-400'
+                    }`}>
                       {f.tag}
                     </div>
                   )}
@@ -574,7 +581,7 @@ function HomePage() {
                 </div>
                 <div className="flex-1 text-center md:text-left">
                   <h4 className="font-bold text-base mb-1">🎙️ Voice messages now translate too</h4>
-                  <p className="text-sm text-gray-400">Send a voice note in any language — the bot transcribes it with Voxtral AI, then translates for everyone in the group. Works in DMs too. Text and voice, same seamless flow.</p>
+                  <p className="text-sm text-gray-400">Send a voice note in any language — the bot transcribes it with Voxtral AI, then translates for everyone in the group. Tap 🔊 <strong className="text-cyan-300">Hear it</strong> on any translation to hear it spoken aloud. Works in DMs too.</p>
                 </div>
                 <a href={BOT_URL} target="_blank" rel="noopener noreferrer"
                   className="px-5 py-2.5 rounded-xl text-white text-sm font-semibold no-underline shrink-0"
@@ -593,7 +600,7 @@ function HomePage() {
                 {[
                   { step: '1', title: 'Add bot to group', desc: 'Add @linguaxyz_bot to any Telegram group chat.' },
                   { step: '2', title: 'Each person runs /setlang', desc: 'Pick your language pair — Vietnamese↔English, Japanese↔English, etc.' },
-                  { step: '3', title: 'Chat — text or voice', desc: 'Type messages or send voice notes. The bot transcribes and translates everything automatically.' },
+                  { step: '3', title: 'Chat — text or voice', desc: 'Type messages or send voice notes. The bot translates everything automatically. Tap 🔊 to hear any translation.' },
                 ].map((s, i) => (
                   <div key={i} className="text-center">
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-sm font-bold mx-auto mb-3">{s.step}</div>
