@@ -1127,7 +1127,7 @@ function HomePage() {
 
       {/* Footer */}
       <div className="py-8 px-6 border-t border-white/5 text-center text-gray-500 text-sm">
-        © 2026 LinguaXYZ · nhomnhom.com · Powered by Claude AI
+        Made in California. A product of <a href="https://blackgibbon.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white no-underline">Black Gibbon</a>
       </div>
 
       <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
