@@ -38,8 +38,8 @@ class ErrorBoundary extends Component {
   }
 }
 
-const API = 'https://api.nhomnhom.com';
-const BOT_URL = 'https://t.me/linguaxyz_bot';
+const API = 'https://api.langutalk.com';
+const BOT_URL = 'https://t.me/langutalk_bot';
 const S = {
   card: { background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)', border: '1px solid rgba(255,255,255,0.06)' },
   btnP: { background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)', border: 'none', cursor: 'pointer' },
@@ -135,7 +135,7 @@ function AppInner() {
           <div className="flex items-center gap-8">
             <div className="cursor-pointer flex items-center gap-2.5" onClick={() => navigate('home')}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center"><Globe className="w-4 h-4 text-white" /></div>
-              <span className="font-semibold text-lg tracking-tight">LinguaXYZ</span>
+              <span className="font-semibold text-lg tracking-tight">Langutalk</span>
             </div>
             {!user && (
               <div className="hidden md:flex items-center gap-6">
@@ -471,7 +471,7 @@ const CURRICULUM = [
 ];
 
 const FAQS = [
-  { q: 'How does translation work in group chats?', a: 'Add @linguaxyz_bot to any group. Each member sets their language pairs with /setlang. The bot translates every text message and voice note near real-time — no commands needed. Voice notes are automatically transcribed then translated. Tap 🔊 Hear it on any translation to hear it spoken aloud. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English.' },
+  { q: 'How does translation work in group chats?', a: 'Add @langutalk_bot to any group. Each member sets their language pairs with /setlang. The bot translates every text message and voice note near real-time — no commands needed. Voice notes are automatically transcribed then translated. Tap 🔊 Hear it on any translation to hear it spoken aloud. A Vietnamese speaker sees English messages in Vietnamese; an English speaker sees Vietnamese messages in English.' },
   { q: 'What languages can I translate?', a: 'Translation supports 20 languages including Vietnamese, English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Russian, Arabic, Hindi, and more. Any pair works.' },
   { q: 'What languages can I learn?', a: 'The tutor teaches 6 languages: English, Spanish, French, Japanese, Chinese (Mandarin), and Korean. More coming soon.' },
   { q: 'How much does it cost?', a: 'You get 50k tokens free on signup. Invite a friend and you both get 10k more — unlimited invites. Translation uses ~200 tokens per message; tutor classes use ~2k-5k per session. No subscriptions, no credit card needed.' },
@@ -598,7 +598,7 @@ function HomePage() {
               <h3 className="font-bold text-lg mb-5 text-center">How group translation works</h3>
               <div className="grid md:grid-cols-3 gap-6">
                 {[
-                  { step: '1', title: 'Add bot to group', desc: 'Add @linguaxyz_bot to any Telegram group chat.' },
+                  { step: '1', title: 'Add bot to group', desc: 'Add @langutalk_bot to any Telegram group chat.' },
                   { step: '2', title: 'Each person runs /setlang', desc: 'Pick your language pair — Vietnamese↔English, Japanese↔English, etc.' },
                   { step: '3', title: 'Chat — text or voice', desc: 'Type messages or send voice notes. The bot translates everything automatically. Tap 🔊 to hear any translation.' },
                 ].map((s, i) => (
@@ -1154,7 +1154,7 @@ function Dashboard({ user, inviteStats, usageStats, purchases, purchaseSuccess, 
   const totalInvites = inviteStats?.totalInvites || 0;
   const totalTokensEarned = inviteStats?.totalTokensEarned || 0;
   const totalMessages = usageStats?.totalMessages || 0;
-  const botInviteUrl = `https://t.me/linguaxyz_bot?start=ref_${user.inviteCode}`;
+  const botInviteUrl = `https://t.me/langutalk_bot?start=ref_${user.inviteCode}`;
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-6">
@@ -1163,7 +1163,7 @@ function Dashboard({ user, inviteStats, usageStats, purchases, purchaseSuccess, 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-1">Hi, {user.name}! 👋</h1>
-            <p className="text-gray-400">Your LinguaXYZ dashboard</p>
+            <p className="text-gray-400">Your Langutalk dashboard</p>
           </div>
           <button onClick={onRefresh} style={S.btnS} className="px-4 py-2.5 rounded-xl font-medium flex items-center gap-2 text-sm text-white">
             <RefreshCw className="w-4 h-4" /> Refresh
